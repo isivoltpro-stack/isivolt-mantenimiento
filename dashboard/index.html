@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión OT — Hospital Clínico San Cecilio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d1117; --surface:#161b22; --surface2:#1c2230; --border:#30363d;
+  --accent:#1f6feb; --accent2:#388bfd; --green:#2ea043; --red:#da3633;
+  --orange:#d29922; --purple:#8957e5; --cyan:#1abc9c;
+  --text:#e6edf3; --text2:#8b949e; --text3:#6e7681;
+  --shadow:0 8px 32px rgba(0,0,0,.45);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+
+/* ── SETUP SCREEN ── */
+#setupScreen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:24px;
+}
+.setup-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:40px;max-width:560px;width:100%;text-align:center;
+}
+.setup-card .logo{font-size:48px;margin-bottom:16px}
+.setup-card h1{font-size:22px;font-weight:700;margin-bottom:8px}
+.setup-card p{color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:24px}
+.setup-steps{text-align:left;margin-bottom:28px}
+.step{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.step-num{
+  width:26px;height:26px;border-radius:50%;background:var(--accent);
+  color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.step-text{font-size:13px;color:var(--text2);line-height:1.5}
+.step-text strong{color:var(--text)}
+.url-input{
+  width:100%;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;
+  margin-bottom:16px;
+}
+.url-input:focus{outline:none;border-color:var(--accent)}
+.url-input::placeholder{color:var(--text3)}
+
+/* ── HEADER ── */
+header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 24px;display:flex;align-items:center;justify-content:space-between;
+  height:64px;position:sticky;top:0;z-index:100;
+}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-icon{
+  width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--purple));
+  border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.logo-wrap h1{font-size:15px;font-weight:600}
+.logo-wrap span{font-size:11px;color:var(--text2);display:block;font-weight:400}
+.header-right{display:flex;gap:8px;align-items:center}
+.sync-indicator{
+  display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);
+  padding:6px 10px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:20px;
+}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.sync-dot.syncing{background:var(--orange);animation:pulse 1s infinite}
+.sync-dot.error{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── BUTTONS ── */
+.btn{
+  padding:8px 16px;border-radius:7px;border:1px solid var(--border);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;
+  transition:all .15s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn-danger:hover{opacity:.85}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* ── CONTAINER ── */
+.container{max-width:1440px;margin:0 auto;padding:24px}
+
+/* ── STATS ── */
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:26px}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;display:flex;align-items:center;gap:14px;
+}
+.stat-icon{
+  width:42px;height:42px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;
+}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.stat-value{font-size:24px;font-weight:700;font-family:'Space Mono',monospace;line-height:1.2}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;align-items:center}
+.search-wrap{flex:1;min-width:180px;position:relative}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5}
+.search-wrap input{
+  width:100%;padding:9px 12px 9px 34px;background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:13px;
+}
+.search-wrap input:focus{outline:none;border-color:var(--accent)}
+select{
+  padding:9px 12px;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;
+}
+select:focus{outline:none;border-color:var(--accent)}
+.view-toggle{
+  display:flex;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.view-toggle button{
+  padding:8px 13px;background:transparent;border:none;color:var(--text2);
+  cursor:pointer;font-size:15px;transition:all .15s;
+}
+.view-toggle button.active{background:var(--accent);color:#fff}
+
+/* ── SECTION HEADER ── */
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.section-head h2{font-size:14px;font-weight:600;color:var(--text2)}
+.count-pill{
+  background:var(--surface2);border:1px solid var(--border);border-radius:20px;
+  padding:2px 10px;font-size:11px;color:var(--text3);font-family:'Space Mono',monospace;
+}
+
+/* ── CARDS GRID ── */
+.ot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:18px}
+.ot-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;
+}
+.ot-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--accent)}
+.card-bar{height:4px}
+.card-top{padding:15px 18px 10px;display:flex;justify-content:space-between;align-items:flex-start}
+.card-num{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)}
+.badges{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.badge{
+  padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.b-iniciada{background:rgba(46,160,67,.15);color:#3fb950;border:1px solid rgba(46,160,67,.3)}
+.b-demorada{background:rgba(210,153,34,.15);color:#e3b341;border:1px solid rgba(210,153,34,.3)}
+.b-cerrada{background:rgba(139,148,158,.15);color:#8b949e;border:1px solid rgba(139,148,158,.3)}
+.b-preventivo{background:rgba(137,87,229,.15);color:#a371f7;border:1px solid rgba(137,87,229,.3)}
+.b-correctivo{background:rgba(218,54,51,.15);color:#f85149;border:1px solid rgba(218,54,51,.3)}
+.b-prl{background:rgba(210,153,34,.2);color:#e3b341;border:1px solid rgba(210,153,34,.4)}
+
+.card-body{padding:0 18px 14px}
+.card-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.meta-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.meta-val{font-size:12px;color:var(--text2);font-weight:500;margin-top:1px}
+.card-obs{
+  background:var(--surface2);border-radius:7px;padding:9px 11px;
+  font-size:11px;color:var(--text2);border-left:3px solid var(--accent);
+  line-height:1.5;margin-bottom:10px;white-space:pre-wrap;font-style:italic;
+}
+.card-informe{
+  background:rgba(46,160,67,.07);border:1px dashed rgba(46,160,67,.3);
+  border-radius:7px;padding:9px 11px;font-size:11px;color:#3fb950;margin-bottom:10px;
+}
+.card-informe-empty{
+  background:var(--surface2);border:1px dashed var(--border);
+  border-radius:7px;padding:8px 11px;font-size:11px;color:var(--text3);
+  margin-bottom:10px;text-align:center;
+}
+.card-area{font-size:12px;color:var(--text);font-weight:500}
+.card-demora{font-size:11px;color:#e3b341;margin-bottom:8px}
+.card-foot{
+  padding:10px 18px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.card-date{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace}
+.card-actions{display:flex;gap:5px}
+.icon-btn{
+  width:28px;height:28px;border-radius:6px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;
+}
+.icon-btn:hover{background:var(--surface2);color:var(--text)}
+
+/* ── TABLE ── */
+.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.ot-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.ot-tbl th{
+  padding:11px 14px;text-align:left;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--text2);
+  background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;
+}
+.ot-tbl td{padding:13px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.ot-tbl tr:last-child td{border-bottom:none}
+.ot-tbl tr:hover td{background:rgba(31,111,235,.05)}
+
+/* ── MODAL ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  width:100%;max-width:720px;max-height:91vh;overflow-y:auto;
+  transform:scale(.96);transition:transform .2s;
+}
+.overlay.open .modal{transform:scale(1)}
+.modal-hd{
+  padding:18px 24px 14px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;background:var(--surface);z-index:1;
+}
+.modal-hd h2{font-size:16px;font-weight:600}
+.close-btn{
+  width:30px;height:30px;border-radius:7px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);cursor:pointer;font-size:17px;
+  display:flex;align-items:center;justify-content:center;
+}
+.close-btn:hover{background:var(--surface2);color:var(--text)}
+.modal-bd{padding:22px 24px}
+.modal-ft{
+  padding:14px 24px;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:8px;
+}
+.f-section{margin-bottom:20px}
+.f-section-title{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text3);padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px;
+}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.f-group{display:flex;flex-direction:column;gap:5px}
+.f-group.full{grid-column:1/-1}
+.f-group label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
+.f-group input,.f-group select,.f-group textarea{
+  padding:9px 11px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
+  transition:border-color .15s;
+}
+.f-group input:focus,.f-group select:focus,.f-group textarea:focus{
+  outline:none;border-color:var(--accent);background:var(--bg);
+}
+.f-group textarea{resize:vertical;min-height:76px}
+
+/* ── EMPTY ── */
+.empty{grid-column:1/-1;text-align:center;padding:72px 20px;color:var(--text3)}
+.empty .ico{font-size:46px;margin-bottom:14px}
+.empty h3{font-size:17px;color:var(--text2);margin-bottom:6px}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:22px;right:22px;padding:12px 18px;border-radius:10px;
+  font-size:13px;font-weight:500;z-index:9999;
+  transform:translateY(70px);opacity:0;transition:all .3s;pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ── LOADING ── */
+.loading-wrap{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px;gap:16px;color:var(--text2);
+}
+.spinner{
+  width:36px;height:36px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .stats-bar{grid-template-columns:1fr 1fr}
+  .ot-grid{grid-template-columns:1fr}
+  .f-grid{grid-template-columns:1fr}
+  header{padding:0 14px}
+  .container{padding:14px}
+}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     SETUP SCREEN — shown until URL is configured
+═══════════════════════════════════════════════ -->
+<div id="setupScreen">
+  <div class="setup-card">
+    <div class="logo">🏥</div>
+    <h1>Configuración inicial</h1>
+    <p>Para conectar el dashboard con tu Google Sheet necesitas pegar la URL del Apps Script desplegado.</p>
+    <div class="setup-steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Sube el Excel a <strong>Google Drive</strong> y ábrelo como <strong>Google Sheets</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Ve a <strong>Extensiones → Apps Script</strong> y pega el contenido de <strong>apps_script.gs</strong></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Haz clic en <strong>Desplegar → Nueva implementación</strong> → Tipo: <strong>Aplicación web</strong> → Acceso: <strong>Cualquier persona</strong></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Copia la <strong>URL de implementación</strong> y pégala aquí abajo</div></div>
+    </div>
+    <input class="url-input" id="scriptUrlInput" type="url"
+           placeholder="https://script.google.com/macros/s/XXXXX.../exec"
+           value="">
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveUrl()">
+      ✅ Conectar y abrir dashboard
+    </button>
+    <p style="margin-top:14px;font-size:12px;color:var(--text3)">La URL se guarda en tu navegador. Solo necesitas configurarlo una vez.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════ -->
+<div id="app" style="display:none">
+
+<header>
+  <div class="logo-wrap">
+    <div class="logo-icon">🏥</div>
+    <div>
+      <h1>Gestión OT</h1>
+      <span>Hospital U. Clínico San Cecilio</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="sync-indicator">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncLabel">Conectado</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="loadOTs()">↻ Actualizar</button>
+    <button class="btn btn-ghost btn-sm" onclick="resetUrl()">⚙️</button>
+    <button class="btn btn-primary btn-sm" onclick="openModal()">+ Nueva OT</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="stats-bar" id="statsBar"></div>
+
+  <div class="filters">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Buscar OT, área, descripción..." oninput="renderOTs()">
+    </div>
+    <select id="fEstado" onchange="renderOTs()">
+      <option value="">Todos los estados</option>
+      <option>Iniciada</option><option>Demorada</option><option>Cerrada</option>
+    </select>
+    <select id="fTipo" onchange="renderOTs()">
+      <option value="">Todos los tipos</option>
+      <option>PREVENTIVO</option><option>CORRECTIVO</option>
+    </select>
+    <select id="fEspec" onchange="renderOTs()">
+      <option value="">Todas las especialidades</option>
+      <option>ELECTRICIDAD</option><option>FONTANERIA</option>
+      <option>CLIMATIZACION</option><option>OTROS</option>
+    </select>
+    <div class="view-toggle">
+      <button id="btnGrid" class="active" onclick="setView('grid')" title="Tarjetas">⊞</button>
+      <button id="btnTable" onclick="setView('table')" title="Tabla">☰</button>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <h2>Órdenes de Trabajo</h2>
+    <span class="count-pill" id="otCount">—</span>
+  </div>
+
+  <div id="otContainer"></div>
+
+</div>
+</div><!-- /#app -->
+
+<!-- ═══ MODAL ═══ -->
+<div class="overlay" id="overlay" onclick="closeOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-hd">
+      <h2 id="modalTitle">Nueva OT</h2>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-bd">
+
+      <div class="f-section">
+        <div class="f-section-title">📋 Identificación</div>
+        <div class="f-grid">
+          <div class="f-group"><label>Número OT *</label><input id="f_numOT" placeholder="2026/XXXXX" required></div>
+          <div class="f-group"><label>Estado OT</label>
+            <select id="f_estado"><option>Iniciada</option><option>Demorada</option><option>Cerrada</option></select>
+          </div>
+          <div class="f-group"><label>Tipo Intervención</label>
+            <select id="f_tipoIntervencion"><option>PREVENTIVO</option><option>CORRECTIVO</option></select>
+          </div>
+          <div class="f-group"><label>Tipo OT</label>
+            <select id="f_tipoOT"><option>Instalación</option><option>Correctivo</option><option>Preventivo</option></select>
+          </div>
+          <div class="f-group"><label>Num Aviso</label><input id="f_numAviso" placeholder="2026/XXXXX"></div>
+          <div class="f-group"><label>Contacto</label><input id="f_contacto" placeholder="Nombre — Teléfono"></div>
+        </div>
+      </div>
+
+      <div class="f-section">
+        <div class="f-section-title">🏗️ Instalación</div>
+        <div class="f-grid">
+          <div class="f-group"><label>Especialidad</label>
+            <select id="f_especialidad">
+              <option>ELECTRICIDAD</option><option>FONTANERIA</option>
+              <option>CLIMATIZACION</option><option>OTROS</option>
+            </select>
+          </div>
+          <div class="f-group"><label>Departamento</label><input id="f_departamento"></div>
+          <div class="f-group"><label>Grupo Instalación</label><input id="f_grupoInsta" placeholder="Ej: ASCENSORES"></div>
+          <div class="f-group"><label>SubGrupo Instalación</label><input id="f_subGrupoInsta" placeholder="Ej: OTROS"></div>
+          <div class="f-group full"><label>Centro de Consumo / Área</label><input id="f_area" placeholder="Planta, Quirófano, Servicio..."></div>
+        </div>
+      </div>
+
+      <div class="f-section">
+        <div class="f-section-title">📅 Fechas</div>
+        <div class="f-grid">
+          <div class="f-group"><label>Fecha Aviso</label><input type="datetime-local" id="f_fechaAviso"></div>
+          <div class="f-group"><label>Fecha Lanzamiento</label><input type="datetime-local" id="f_fechaLanza"></div>
+          <div class="f-group"><label>Fecha Ini Intervención</label><input type="datetime-local" id="f_fechaIniInter"></div>
+          <div class="f-group"><label>Fecha Fin Intervención</label><input type="datetime-local" id="f_fechaFinInter"></div>
+        </div>
+      </div>
+
+      <div class="f-section">
+        <div class="f-section-title">⚙️ Detalle</div>
+        <div class="f-grid">
+          <div class="f-group"><label>Tipo Avería</label><input id="f_tipoAveria"></div>
+          <div class="f-group"><label>Situación Final</label>
+            <select id="f_situacionFinal">
+              <option value="">— Sin asignar —</option>
+              <option>Resuelto</option><option>Pendiente</option><option>En proceso</option>
+            </select>
+          </div>
+          <div class="f-group full"><label>Motivo Demora</label><input id="f_motivoDemora" placeholder="Ej: Pendiente estudio técnico"></div>
+          <div class="f-group"><label>Valor Contador</label><input type="number" id="f_contador" placeholder="0.000" step="0.001"></div>
+          <div class="f-group"><label>PRL</label>
+            <select id="f_prl"><option>Sí</option><option>No</option></select>
+          </div>
+          <div class="f-group"><label>Nº Serie Activo</label><input id="f_numSerie"></div>
+        </div>
+      </div>
+
+      <div class="f-section">
+        <div class="f-section-title">📝 Texto</div>
+        <div class="f-grid">
+          <div class="f-group full"><label>Observaciones de la OT</label>
+            <textarea id="f_observaciones" rows="3" placeholder="ASCENSORES&#10;LUN(T); MAR(T); MIÉ(T)..."></textarea>
+          </div>
+          <div class="f-group full"><label>📄 Informe del Técnico</label>
+            <textarea id="f_informe" rows="4" placeholder="Diagnóstico, acciones realizadas, materiales usados..."></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger" id="deleteBtn" onclick="deleteCurrentOT()" style="display:none">🗑 Eliminar</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveOT()">
+        <span id="saveBtnText">💾 Guardar OT</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
+let SCRIPT_URL = localStorage.getItem('ot_script_url') || '';
+let otData = [];
+let editingRow = null;   // sheet row number (1-based)
+let editingIdx = null;   // index in otData array
+let view = 'grid';
+
+// ── Setup screen ──────────────────────────
+function saveUrl() {
+  const url = document.getElementById('scriptUrlInput').value.trim();
+  if (!url.startsWith('https://script.google.com')) {
+    toast('Pega la URL correcta de Apps Script', 'error'); return;
+  }
+  SCRIPT_URL = url;
+  localStorage.setItem('ot_script_url', url);
+  startApp();
+}
+
+function resetUrl() {
+  localStorage.removeItem('ot_script_url');
+  SCRIPT_URL = '';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('setupScreen').style.display = 'flex';
+}
+
+function startApp() {
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadOTs();
+}
+
+// ── API calls ─────────────────────────────
+function setSyncState(state) {
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  dot.className = 'sync-dot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+  lbl.textContent = state === 'syncing' ? 'Sincronizando...' : state === 'error' ? 'Error' : 'Conectado';
+}
+
+async function loadOTs() {
+  setSyncState('syncing');
+  document.getElementById('otContainer').innerHTML =
+    `<div class="loading-wrap"><div class="spinner"></div><span>Cargando datos desde Google Sheets...</span></div>`;
+  try {
+    const res = await fetch(SCRIPT_URL + '?t=' + Date.now());
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    otData = json.data;
+    setSyncState('ok');
+    renderStats();
+    renderOTs();
+  } catch(e) {
+    setSyncState('error');
+    document.getElementById('otContainer').innerHTML =
+      `<div class="loading-wrap" style="color:var(--red)">⚠️ Error al conectar: ${e.message}</div>`;
+  }
+}
+
+async function apiPost(body) {
+  setSyncState('syncing');
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(body)
+  });
+  const json = await res.json();
+  setSyncState(json.ok ? 'ok' : 'error');
+  return json;
+}
+
+// ══════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════
+function getFiltered() {
+  const s = document.getElementById('searchInput').value.toLowerCase();
+  const e = document.getElementById('fEstado').value;
+  const t = document.getElementById('fTipo').value;
+  const es = document.getElementById('fEspec').value;
+  return otData.filter(o =>
+    (!s || [o.numOT,o.observaciones,o.area,o.contacto].join(' ').toLowerCase().includes(s)) &&
+    (!e || o.estado === e) &&
+    (!t || o.tipoIntervencion === t) &&
+    (!es || o.especialidad === es)
+  );
+}
+
+function renderStats() {
+  const t = otData.length;
+  const ini = otData.filter(o=>o.estado==='Iniciada').length;
+  const dem = otData.filter(o=>o.estado==='Demorada').length;
+  const cer = otData.filter(o=>o.estado==='Cerrada').length;
+  const prev = otData.filter(o=>o.tipoIntervencion==='PREVENTIVO').length;
+  document.getElementById('statsBar').innerHTML = [
+    ['rgba(31,111,235,.15)','📋','Total OTs',t,'var(--accent2)'],
+    ['rgba(46,160,67,.15)','✅','Iniciadas',ini,'#3fb950'],
+    ['rgba(210,153,34,.15)','⏳','Demoradas',dem,'#e3b341'],
+    ['rgba(218,54,51,.15)','🔴','Cerradas',cer,'#f85149'],
+    ['rgba(137,87,229,.15)','🔧','Preventivas',prev,'#a371f7'],
+  ].map(([bg,ico,lbl,val,col])=>`
+    <div class="stat-card">
+      <div class="stat-icon" style="background:${bg}">${ico}</div>
+      <div><div class="stat-label">${lbl}</div><div class="stat-value" style="color:${col}">${val}</div></div>
+    </div>`).join('');
+}
+
+function renderOTs() {
+  const filtered = getFiltered();
+  document.getElementById('otCount').textContent = `${filtered.length} OT${filtered.length!==1?'s':''}`;
+  const c = document.getElementById('otContainer');
+  if (view === 'grid') {
+    if (!filtered.length) {
+      c.innerHTML = `<div class="ot-grid"><div class="empty"><div class="ico">📭</div><h3>Sin resultados</h3><p>Prueba otros filtros o añade una OT</p></div></div>`;
+      return;
+    }
+    c.innerHTML = `<div class="ot-grid">${filtered.map(cardHTML).join('')}</div>`;
+  } else {
+    c.innerHTML = tableHTML(filtered);
+  }
+}
+
+function accentBar(o) {
+  if (o.tipoIntervencion==='CORRECTIVO') return 'background:linear-gradient(90deg,#da3633,#b91c1c)';
+  if (o.tipoIntervencion==='PREVENTIVO') return 'background:linear-gradient(90deg,#8957e5,#6e40c9)';
+  return 'background:linear-gradient(90deg,#1f6feb,#1e40af)';
+}
+
+function estadoBadge(e) {
+  const m={'Iniciada':'b-iniciada','Demorada':'b-demorada','Cerrada':'b-cerrada'};
+  return `<span class="badge ${m[e]||''}">${e}</span>`;
+}
+function tipoBadge(t) {
+  return `<span class="badge ${t==='PREVENTIVO'?'b-preventivo':'b-correctivo'}">${t==='PREVENTIVO'?'Preventivo':'Correctivo'}</span>`;
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  try {
+    const dt = new Date(d.replace(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2})/,'$3-$2-$1T$4'));
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+
+           dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  } catch{ return d; }
+}
+
+function cardHTML(o) {
+  const idx = otData.indexOf(o);
+  const obs = (o.observaciones||'').substring(0,130) + ((o.observaciones||'').length>130?'…':'');
+  const infBlock = o.informe
+    ? `<div class="card-informe">📄 ${o.informe.substring(0,100)}${o.informe.length>100?'…':''}</div>`
+    : `<div class="card-informe-empty">📄 Sin informe — edita para añadir</div>`;
+  return `
+  <div class="ot-card" onclick="openModal(${idx})">
+    <div class="card-bar" style="${accentBar(o)}"></div>
+    <div class="card-top">
+      <div class="card-num">${o.numOT}</div>
+      <div class="badges">
+        ${o.prl==='Sí'?'<span class="badge b-prl">⚠️ PRL</span>':''}
+        ${estadoBadge(o.estado)}
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta">
+        <div><div class="meta-lbl">Tipo</div><div class="meta-val">${tipoBadge(o.tipoIntervencion)}</div></div>
+        <div><div class="meta-lbl">Especialidad</div><div class="meta-val">${o.especialidad||'—'}</div></div>
+        <div><div class="meta-lbl">Grupo Inst.</div><div class="meta-val">${o.grupoInsta||'—'}</div></div>
+        <div><div class="meta-lbl">Tipo OT</div><div class="meta-val">${o.tipoOT||'—'}</div></div>
+      </div>
+      ${obs?`<div class="card-obs">${obs}</div>`:''}
+      ${infBlock}
+      ${o.motivoDemora?`<div class="card-demora">⏳ ${o.motivoDemora}</div>`:''}
+      <div class="card-area">${o.area||'—'}</div>
+    </div>
+    <div class="card-foot">
+      <div class="card-date">📅 ${fmtDate(o.fechaLanza)}</div>
+      <div class="card-actions" onclick="event.stopPropagation()">
+        <button class="icon-btn" onclick="openModal(${idx})" title="Editar">✏️</button>
+        <button class="icon-btn" onclick="confirmDelete(${idx})" title="Eliminar">🗑</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function tableHTML(data) {
+  if (!data.length) return `<div class="empty"><div class="ico">📭</div><h3>Sin resultados</h3></div>`;
+  return `<div class="tbl-wrap"><table class="ot-tbl"><thead><tr>
+    <th>Num OT</th><th>Estado</th><th>Tipo</th><th>Especialidad</th>
+    <th>Área</th><th>Observaciones</th><th>Fecha Lanza.</th><th>Informe</th><th></th>
+  </tr></thead><tbody>${data.map(o=>{
+    const idx=otData.indexOf(o);
+    return `<tr>
+      <td><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--accent2)">${o.numOT}</span></td>
+      <td>${estadoBadge(o.estado)}</td>
+      <td>${tipoBadge(o.tipoIntervencion)}</td>
+      <td style="font-size:11px">${o.especialidad||'—'}</td>
+      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${o.area||'—'}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${(o.observaciones||'').replace(/\n/g,' ')}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3)">${fmtDate(o.fechaLanza)}</td>
+      <td style="font-size:11px;color:${o.informe?'#3fb950':'var(--text3)'}">${o.informe?'✅ Sí':'—'}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="icon-btn" onclick="openModal(${idx})">✏️</button>
+        <button class="icon-btn" onclick="confirmDelete(${idx})">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('')}</tbody></table></div>`;
+}
+
+// ══════════════════════════════════════════
+//  VIEW TOGGLE
+// ══════════════════════════════════════════
+function setView(v) {
+  view = v;
+  document.getElementById('btnGrid').classList.toggle('active', v==='grid');
+  document.getElementById('btnTable').classList.toggle('active', v==='table');
+  renderOTs();
+}
+
+// ══════════════════════════════════════════
+//  MODAL
+// ══════════════════════════════════════════
+function openModal(idx) {
+  editingIdx = (idx !== undefined) ? idx : null;
+  editingRow = null;
+  const isEdit = editingIdx !== null;
+  document.getElementById('modalTitle').textContent = isEdit ? `Editar OT — ${otData[idx].numOT}` : 'Nueva OT';
+  document.getElementById('deleteBtn').style.display = isEdit ? 'flex' : 'none';
+
+  if (isEdit) {
+    const o = otData[idx];
+    editingRow = o._row;
+    const flds = ['numOT','estado','tipoIntervencion','tipoOT','numAviso','contacto',
+                  'especialidad','departamento','grupoInsta','subGrupoInsta','area',
+                  'fechaAviso','fechaLanza','fechaIniInter','fechaFinInter',
+                  'tipoAveria','situacionFinal','motivoDemora','contador','prl','numSerie',
+                  'observaciones','informe'];
+    flds.forEach(k => {
+      const el = document.getElementById('f_'+k);
+      if (el) el.value = o[k] || '';
+    });
+  } else {
+    document.getElementById('modal').querySelectorAll('input,select,textarea').forEach(el=>el.value='');
+    document.getElementById('f_estado').value = 'Iniciada';
+    document.getElementById('f_tipoIntervencion').value = 'PREVENTIVO';
+    document.getElementById('f_tipoOT').value = 'Instalación';
+    document.getElementById('f_especialidad').value = 'ELECTRICIDAD';
+    document.getElementById('f_prl').value = 'No';
+    const now = new Date().toISOString().slice(0,16);
+    document.getElementById('f_fechaAviso').value = now;
+    document.getElementById('f_fechaLanza').value = now;
+  }
+
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  editingIdx = null; editingRow = null;
+}
+
+function closeOutside(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+async function saveOT() {
+  const numOT = document.getElementById('f_numOT').value.trim();
+  if (!numOT) { toast('El número de OT es obligatorio','error'); return; }
+
+  const data = {};
+  ['numOT','estado','tipoIntervencion','tipoOT','numAviso','contacto',
+   'especialidad','departamento','grupoInsta','subGrupoInsta','area',
+   'fechaAviso','fechaLanza','fechaIniInter','fechaFinInter',
+   'tipoAveria','situacionFinal','motivoDemora','contador','prl','numSerie',
+   'observaciones','informe'].forEach(k => {
+    const el = document.getElementById('f_'+k);
+    data[k] = el ? el.value : '';
+  });
+
+  const btn = document.getElementById('saveBtn');
+  const lbl = document.getElementById('saveBtnText');
+  btn.disabled = true; lbl.textContent = '⏳ Guardando...';
+
+  try {
+    const action = editingIdx !== null ? 'update' : 'create';
+    const body = { action, data };
+    if (action === 'update') body.row = editingRow;
+
+    const res = await apiPost(body);
+    if (!res.ok) throw new Error(res.error);
+
+    toast(action==='create' ? '✅ OT creada en Google Sheets' : '✅ OT actualizada en Google Sheets');
+    closeModal();
+    await loadOTs();
+  } catch(e) {
+    toast('Error: '+e.message, 'error');
+  } finally {
+    btn.disabled = false; lbl.textContent = '💾 Guardar OT';
+  }
+}
+
+async function confirmDelete(idx) {
+  if (!confirm(`¿Eliminar la OT ${otData[idx].numOT}? Esta acción no se puede deshacer.`)) return;
+  try {
+    const res = await apiPost({ action:'delete', row: otData[idx]._row });
+    if (!res.ok) throw new Error(res.error);
+    toast('🗑 OT eliminada');
+    await loadOTs();
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+async function deleteCurrentOT() {
+  if (editingIdx === null) return;
+  closeModal();
+  await confirmDelete(editingIdx);
+}
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='error' ? 'var(--red)' : 'var(--green)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+// ══════════════════════════════════════════
+//  KEYBOARD
+// ══════════════════════════════════════════
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+if (SCRIPT_URL) {
+  startApp();
+} else {
+  document.getElementById('setupScreen').style.display = 'flex';
+}
+</script>
+</body>
+</html>

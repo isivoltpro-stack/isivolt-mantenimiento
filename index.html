@@ -16,9 +16,9 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
 
-/* ── SETUP SCREEN ── */
+/* ── SETUP SCREEN (oculto para modo offline) ── */
 #setupScreen{
-  display:flex;align-items:center;justify-content:center;
+  display:none;align-items:center;justify-content:center;
   min-height:100vh;padding:24px;
 }
 .setup-card{
@@ -513,23 +513,23 @@ function setSyncState(state) {
   lbl.textContent = state === 'syncing' ? 'Sincronizando...' : state === 'error' ? 'Error' : 'Conectado';
 }
 
-async function loadOTs() {
-  setSyncState('syncing');
-  document.getElementById('otContainer').innerHTML =
-    `<div class="loading-wrap"><div class="spinner"></div><span>Cargando datos desde Google Sheets...</span></div>`;
-  try {
-    const res = await fetch(SCRIPT_URL + '?t=' + Date.now());
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.error);
-    otData = json.data;
-    setSyncState('ok');
-    renderStats();
-    renderOTs();
-  } catch(e) {
-    setSyncState('error');
-    document.getElementById('otContainer').innerHTML =
-      `<div class="loading-wrap" style="color:var(--red)">⚠️ Error al conectar: ${e.message}</div>`;
-  }
+// Datos locales de incidencias (sin API)
+const otDataLocal = [
+  {numOT:"INC-001",estadoOT:"Pendiente",tipoIntervencion:"CORRECTIVO",tipoOT:"URGENTE",especialidad:"ELECTRICIDAD",area:"Planta 1 - Pediatría",fechaAviso:"05/03/2026",observaciones:"Pantalla no funciona Planta 1 Pediatría"},
+  {numOT:"INC-002",estadoOT:"Pendiente",tipoIntervencion:"CORRECTIVO",tipoOT:"ALTA",especialidad:"ELECTRICIDAD",area:"Planta 0 - Cocina",fechaAviso:"05/03/2026",observaciones:"4 puntos enchufe Cocina - Presupuesto: 742€"},
+  {numOT:"INC-003",estadoOT:"Cerrada",tipoIntervencion:"CORRECTIVO",tipoOT:"MEDIA",especialidad:"FONTANERÍA",area:"-",fechaAviso:"05/03/2026",observaciones:"Tubería con posible fuga"},
+  {numOT:"INC-004",estadoOT:"Cerrada",tipoIntervencion:"CORRECTIVO",tipoOT:"MEDIA",especialidad:"ELECTRICIDAD",area:"-",fechaAviso:"05/03/2026",observaciones:"Luminaria descolgada"},
+  {numOT:"INC-005",estadoOT:"Cerrada",tipoIntervencion:"CORRECTIVO",tipoOT:"MEDIA-ALTA",especialidad:"FONTANERÍA",area:"-",fechaAviso:"05/03/2026",observaciones:"Sifón con posible fuga"},
+  {numOT:"INC-006",estadoOT:"Cerrada",tipoIntervencion:"CORRECTIVO",tipoOT:"ALTA",especialidad:"ELECTRICIDAD",area:"-",fechaAviso:"05/03/2026",observaciones:"Enchufe quemado (URGENTE)"},
+  {numOT:"CUR-001",estadoOT:"Cerrada",tipoIntervencion:"PREVENTIVO",tipoOT:"BAJA",especialidad:"FORMACIÓN",area:"Sala Docencia P5",fechaAviso:"05/03/2026",observaciones:"Curso instalaciones eléctricas - 10/03/2026 16:00"}
+];
+
+// Usar datos locales directamente
+function loadOTs() {
+  setSyncState('ok');
+  otData = otDataLocal;
+  renderStats();
+  renderOTs();
 }
 
 async function apiPost(body) {

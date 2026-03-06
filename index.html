@@ -331,12 +331,7 @@ let view = 'grid';
 //  GITHUB API — READ
 // ══════════════════════════════════════════════════════
 async function loadFromGitHub() {
-  // Guardar token en localStorage
-function saveToken() {
-  const t = prompt('Introduce tu GitHub Token:');
-  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
-}
-setSyncState('saving', 'Cargando...');
+  setSyncState('saving', 'Cargando...');
   try {
     const res = await fetch(GH.api + '?t=' + Date.now(), {
       headers: { Authorization: `token ${GH.token}` }
@@ -345,20 +340,10 @@ setSyncState('saving', 'Cargando...');
     const json = await res.json();
     fileSha = json.sha;
     otData = JSON.parse(atob(json.content.replace(/\n/g,'')));
-    // Guardar token en localStorage
-function saveToken() {
-  const t = prompt('Introduce tu GitHub Token:');
-  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
-}
-setSyncState('ok', 'Sincronizado');
+    setSyncState('ok', 'Sincronizado');
     render();
   } catch(e) {
-    // Guardar token en localStorage
-function saveToken() {
-  const t = prompt('Introduce tu GitHub Token:');
-  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
-}
-setSyncState('error', 'Error de red');
+    setSyncState('error', 'Error de red');
     showToast('❌ No se pudo cargar: ' + e.message, 'error');
   }
 }
@@ -367,12 +352,7 @@ setSyncState('error', 'Error de red');
 //  GITHUB API — WRITE
 // ══════════════════════════════════════════════════════
 async function saveToGitHub(msg) {
-  // Guardar token en localStorage
-function saveToken() {
-  const t = prompt('Introduce tu GitHub Token:');
-  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
-}
-setSyncState('saving', 'Guardando...');
+  setSyncState('saving', 'Guardando...');
   try {
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(otData, null, 2))));
     const body = { message: msg || 'Update OTs', content, sha: fileSha };
@@ -390,20 +370,10 @@ setSyncState('saving', 'Guardando...');
     }
     const json = await res.json();
     fileSha = json.content.sha;
-    // Guardar token en localStorage
-function saveToken() {
-  const t = prompt('Introduce tu GitHub Token:');
-  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
-}
-setSyncState('ok', 'Guardado ✓');
+    setSyncState('ok', 'Guardado ✓');
     return true;
   } catch(e) {
-    // Guardar token en localStorage
-function saveToken() {
-  const t = prompt('Introduce tu GitHub Token:');
-  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
-}
-setSyncState('error', 'Error al guardar');
+    setSyncState('error', 'Error al guardar');
     showToast('❌ Error al guardar: ' + e.message, 'error');
     return false;
   }
@@ -412,12 +382,7 @@ setSyncState('error', 'Error al guardar');
 // ══════════════════════════════════════════════════════
 //  SYNC STATE
 // ══════════════════════════════════════════════════════
-function // Guardar token en localStorage
-function saveToken() {
-  const t = prompt('Introduce tu GitHub Token:');
-  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
-}
-setSyncState(state, label) {
+function setSyncState(state, label) {
   const dot = document.getElementById('syncDot');
   const lbl = document.getElementById('syncLabel');
   dot.className = 'sync-dot' + (state==='saving'?' saving':state==='error'?' error':'');

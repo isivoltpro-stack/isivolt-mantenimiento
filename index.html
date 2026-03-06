@@ -157,7 +157,7 @@ select:focus{outline:none;border-color:var(--accent)}
       <span id="syncLabel">Sincronizado</span>
     </div>
     <button class="btn btn-ghost btn-sm" onclick="loadFromGitHub()">↻</button>
-    <button class="btn btn-ghost btn-sm" onclick="toggleApiDocs()">⚙️ API</button>
+    <button class="btn btn-ghost btn-sm" onclick="saveToken(); toggleApiDocs()">⚙️ API</button>
     <button class="btn btn-primary btn-sm" onclick="openModal()">+ Nueva OT</button>
   </div>
 </header>
@@ -197,7 +197,7 @@ Body: { "action": "update", "numOT": "2026/11917", "changes": {
 
     <div class="api-desc"><strong>🗑 Eliminar OT:</strong></div>
     <div class="api-block">POST ... Body: { "action": "delete", "numOT": "2026/11917" }</div>
-    <button class="btn btn-ghost btn-sm" onclick="toggleApiDocs()">Cerrar</button>
+    <button class="btn btn-ghost btn-sm" onclick="saveToken(); toggleApiDocs()">Cerrar</button>
   </div>
 
   <div class="stats-bar" id="statsBar"></div>
@@ -331,7 +331,12 @@ let view = 'grid';
 //  GITHUB API — READ
 // ══════════════════════════════════════════════════════
 async function loadFromGitHub() {
-  setSyncState('saving', 'Cargando...');
+  // Guardar token en localStorage
+function saveToken() {
+  const t = prompt('Introduce tu GitHub Token:');
+  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
+}
+setSyncState('saving', 'Cargando...');
   try {
     const res = await fetch(GH.api + '?t=' + Date.now(), {
       headers: { Authorization: `token ${GH.token}` }
@@ -340,10 +345,20 @@ async function loadFromGitHub() {
     const json = await res.json();
     fileSha = json.sha;
     otData = JSON.parse(atob(json.content.replace(/\n/g,'')));
-    setSyncState('ok', 'Sincronizado');
+    // Guardar token en localStorage
+function saveToken() {
+  const t = prompt('Introduce tu GitHub Token:');
+  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
+}
+setSyncState('ok', 'Sincronizado');
     render();
   } catch(e) {
-    setSyncState('error', 'Error de red');
+    // Guardar token en localStorage
+function saveToken() {
+  const t = prompt('Introduce tu GitHub Token:');
+  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
+}
+setSyncState('error', 'Error de red');
     showToast('❌ No se pudo cargar: ' + e.message, 'error');
   }
 }
@@ -352,7 +367,12 @@ async function loadFromGitHub() {
 //  GITHUB API — WRITE
 // ══════════════════════════════════════════════════════
 async function saveToGitHub(msg) {
-  setSyncState('saving', 'Guardando...');
+  // Guardar token en localStorage
+function saveToken() {
+  const t = prompt('Introduce tu GitHub Token:');
+  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
+}
+setSyncState('saving', 'Guardando...');
   try {
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(otData, null, 2))));
     const body = { message: msg || 'Update OTs', content, sha: fileSha };
@@ -370,10 +390,20 @@ async function saveToGitHub(msg) {
     }
     const json = await res.json();
     fileSha = json.content.sha;
-    setSyncState('ok', 'Guardado ✓');
+    // Guardar token en localStorage
+function saveToken() {
+  const t = prompt('Introduce tu GitHub Token:');
+  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
+}
+setSyncState('ok', 'Guardado ✓');
     return true;
   } catch(e) {
-    setSyncState('error', 'Error al guardar');
+    // Guardar token en localStorage
+function saveToken() {
+  const t = prompt('Introduce tu GitHub Token:');
+  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
+}
+setSyncState('error', 'Error al guardar');
     showToast('❌ Error al guardar: ' + e.message, 'error');
     return false;
   }
@@ -382,7 +412,12 @@ async function saveToGitHub(msg) {
 // ══════════════════════════════════════════════════════
 //  SYNC STATE
 // ══════════════════════════════════════════════════════
-function setSyncState(state, label) {
+function // Guardar token en localStorage
+function saveToken() {
+  const t = prompt('Introduce tu GitHub Token:');
+  if(t) { localStorage.setItem('gh_token', t); location.reload(); }
+}
+setSyncState(state, label) {
   const dot = document.getElementById('syncDot');
   const lbl = document.getElementById('syncLabel');
   dot.className = 'sync-dot' + (state==='saving'?' saving':state==='error'?' error':'');
@@ -569,7 +604,7 @@ async function confirmDelete(id) {
 }
 function deleteCurrentOT(){if(editingId==null)return;closeModal();confirmDelete(editingId)}
 
-function toggleApiDocs(){
+function saveToken(); toggleApiDocs(){
   const p=document.getElementById('apiPanel');
   p.style.display=p.style.display==='none'?'block':'none';
 }

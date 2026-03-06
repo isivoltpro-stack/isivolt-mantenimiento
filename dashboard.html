@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión OT — Hospital | IsiVoltPRO</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#0d1117; --surface:#161b22; --surface2:#1c2230; --border:#30363d; --accent:#1f6feb; --accent2:#388bfd; --green:#2ea043; --red:#da3633; --orange:#d29922; --purple:#8957e5; --text:#e6edf3; --text2:#8b949e; --text3:#6e7681; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo h1{font-size:14px;font-weight:600}
+.logo span{font-size:11px;color:var(--text2)}
+.btn{padding:7px 14px;border-radius:7px;border:1px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn:hover{background:var(--accent2)}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px;display:flex;align-items:center;gap:12px}
+.stat-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;font-weight:600}
+.stat-value{font-size:22px;font-weight:700;font-family:'Space Mono',monospace}
+.ot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.ot-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.ot-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.card-bar{height:4px;background:var(--accent)}
+.card-top{padding:13px 16px;display:flex;justify-content:space-between}
+.card-num{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2)}
+.badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+.b-ini{background:rgba(46,160,67,.15);color:#3fb950}
+.b-dem{background:rgba(210,153,34,.15);color:#e3b341}
+.b-cer{background:rgba(139,148,158,.15);color:#8b949e}
+.card-body{padding:0 16px 12px}
+.card-meta{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.meta-l{font-size:9px;color:var(--text3);text-transform:uppercase;font-weight:600}
+.meta-v{font-size:11px;color:var(--text2)}
+.card-obs{background:var(--surface2);border-radius:7px;padding:8px;font-size:11px;color:var(--text2);border-left:3px solid var(--accent)}
+.card-area{font-size:11px;color:var(--text);font-weight:500}
+.card-foot{padding:9px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+.card-date{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace}
+.icon-btn{width:27px;height:27px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:12px}
+.icon-btn:hover{background:var(--surface2)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:15px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;transform:scale(.96);transition:transform .2s}
+.overlay.open .modal{transform:scale(1)}
+.modal-hd{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-hd h2{font-size:15px;font-weight:600}
+.close-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer}
+.modal-bd{padding:20px}
+.f-group{margin-bottom:12px}
+.f-group label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;display:block;margin-bottom:4px}
+.f-group input,.f-group select,.f-group textarea{width:100%;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px}
+.f-group textarea{resize:vertical;min-height:60px}
+.modal-ft{padding:12px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.toast{position:fixed;bottom:20px;right:20px;padding:11px 17px;border-radius:9px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(70px);opacity:0;transition:all .3s;background:var(--green)}
+.toast.show{transform:translateY(0);opacity:1}
+.filters{display:flex;gap:9px;margin-bottom:20px;flex-wrap:wrap}
+.search-wrap{flex:1;min-width:180px;position:relative}
+.search-wrap input{width:100%;padding:8px 11px 8px 32px;background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text)}
+.search-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3)}
+select{padding:8px 11px;background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div><h1>Gestión OT — IsiVoltPRO</h1><span>Hospital Clínico San Cecilio</span></div>
+  </div>
+  <button class="btn" onclick="openModal()">+ Nueva OT</button>
+</header>
+<div class="container">
+  <div class="stats-bar" id="statsBar"></div>
+  <div class="filters">
+    <div class="search-wrap"><span class="search-ico">🔍</span><input type="text" id="searchInput" placeholder="Buscar..." oninput="renderOTs()"></div>
+    <select id="fEstado" onchange="renderOTs()"><option value="">Todos</option><option>Iniciada</option><option>Demorada</option><option>Cerrada</option><option>Pendiente</option></select>
+    <select id="fTipo" onchange="renderOTs()"><option value="">Todos</option><option>PREVENTIVO</option><option>CORRECTIVO</option></select>
+  </div>
+  <div id="otContainer"></div>
+</div>
+<div class="overlay" id="overlay" onclick="closeOutside(event)">
+  <div class="modal">
+    <div class="modal-hd"><h2 id="modalTitle">Nueva OT</h2><button class="close-btn" onclick="closeModal()">✕</button></div>
+    <div class="modal-bd">
+      <div class="f-group"><label>Número OT *</label><input id="f_numOT"></div>
+      <div class="f-group"><label>Estado</label><select id="f_estado"><option>Iniciada</option><option>Demorada</option><option>Cerrada</option><option>Pendiente</option></select></div>
+      <div class="f-group"><label>Tipo</label><select id="f_tipo"><option>PREVENTIVO</option><option>CORRECTIVO</option></select></div>
+      <div class="f-group"><label>Especialidad</label><select id="f_esp"><option>ELECTRICIDAD</option><option>FONTANERIA</option><option>CLIMATIZACION</option><option>OTROS</option></select></div>
+      <div class="f-group"><label>Área / Ubicación</label><input id="f_area"></div>
+      <div class="f-group"><label>Fecha</label><input id="f_fecha" type="date"></div>
+      <div class="f-group"><label>Observaciones</label><textarea id="f_obs"></textarea></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" style="background:var(--red)" onclick="deleteOT()" id="delBtn">Eliminar</button>
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn" onclick="saveOT()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// Datos iniciales
+let otData = [
+  {id:1,numOT:"2026/11917",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Hospital",fecha:"04/03/2026",obs:"TRABAJOS URGENTES"},
+  {id:2,numOT:"2026/11918",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Hospital",fecha:"04/03/2026",obs:"ASCENSORES"},
+  {id:3,numOT:"2026/11919",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"PLANTA TERCERA",fecha:"04/03/2026",obs:"PUERTAS AUTOMATICAS"},
+  {id:4,numOT:"2026/11920",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Quirófano3Q09",fecha:"04/03/2026",obs:"QUIROFANOS"},
+  {id:5,numOT:"2026/11921",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Reanimación",fecha:"04/03/2026",obs:"QUIROFANOS"},
+  {id:6,numOT:"2026/11922",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Quirófano3Q10",fecha:"04/03/2026",obs:"QUIROFANOS"},
+  {id:7,numOT:"2026/11923",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Quirófano3Q11",fecha:"04/03/2026",obs:"QUIROFANOS"},
+  {id:8,numOT:"2026/11924",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Quirófano3Q12",fecha:"04/03/2026",obs:"QUIROFANOS"},
+  {id:9,numOT:"2026/11925",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Quirófano3Q14",fecha:"04/03/2026",obs:"QUIROFANOS"},
+  {id:10,numOT:"2026/11926",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Quirófano3Q13",fecha:"04/03/2026",obs:"QUIROFANOS"},
+  {id:11,numOT:"2026/11927",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Reanimación",fecha:"04/03/2026",obs:"QUIROFANOS"},
+  {id:12,numOT:"2026/11928",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Radiología Intervencionista",fecha:"04/03/2026",obs:"QUIROFANOS"},
+  {id:13,numOT:"2026/11929",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"Hospital",fecha:"04/03/2026",obs:"TRABAJOS URGENTES"},
+  {id:14,numOT:"2026/11452",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"PLANTA PRIMERA",fecha:"03/03/2026",obs:"RELOJES MENSUAL"},
+  {id:15,numOT:"2026/11453",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"PLANTA SEGUNDA",fecha:"03/03/2026",obs:"RELOJES MENSUAL"},
+  {id:16,numOT:"2026/11454",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"PLANTA TERCERA",fecha:"03/03/2026",obs:"RELOJES MENSUAL"},
+  {id:17,numOT:"2026/11457",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"PLANTA CUARTA",fecha:"03/03/2026",obs:"RELOJES MENSUAL"},
+  {id:18,numOT:"2026/11459",estado:"Iniciada",tipo:"PREVENTIVO",esp:"ELECTRICIDAD",area:"PLANTA SÓTANO",fecha:"03/03/2026",obs:"RELOJES MENSUAL"},
+  {id:19,numOT:"2026/5176",estado:"Demorada",tipo:"CORRECTIVO",esp:"ELECTRICIDAD",area:"HEMATOLOGÍA",fecha:"29/01/2026",obs:"TOMA DE LUZ - PENDIENTE"},
+  {id:20,numOT:"INC-001",estado:"Pendiente",tipo:"CORRECTIVO",esp:"ELECTRICIDAD",area:"Planta 1 - Pediatría",fecha:"05/03/2026",obs:"Pantalla no funciona"},
+  {id:21,numOT:"INC-002",estado:"Pendiente",tipo:"CORRECTIVO",esp:"ELECTRICIDAD",area:"Planta 0 - Cocina",fecha:"05/03/2026",obs:"4 puntos enchufe - 742€"}
+];
+let editingId = null;
+// Cargar desde localStorage
+const saved = localStorage.getItem('otData');
+if(saved) otData = JSON.parse(saved);
+render();
+function render(){renderStats();renderOTs()}
+function renderStats(){
+  const t=otData.length,ini=otData.filter(o=>o.estado==='Iniciada').length,dem=otData.filter(o=>o.estado==='Demorada').length,cer=otData.filter(o=>o.estado==='Cerrada').length,pen=otData.filter(o=>o.estado==='Pendiente').length;
+  document.getElementById('statsBar').innerHTML=[
+    ['📋','Total',t,'var(--accent2)'],
+    ['✅','Iniciadas',ini,'#3fb950'],
+    ['⏳','Demoradas',dem,'#e3b341'],
+    ['🔴','Cerradas',cer,'#f85149'],
+    ['⚠️','Pendientes',pen,'#e3b341']
+  ].map(([i,l,v,c])=>`<div class="stat-card"><div class="stat-icon" style="background:rgba(31,111,235,.15)">${i}</div><div><div class="stat-label">${l}</div><div class="stat-value" style="color:${c}">${v}</div></div></div>`).join('');
+}
+function getFiltered(){
+  const s=document.getElementById('searchInput').value.toLowerCase(),e=document.getElementById('fEstado').value,t=document.getElementById('fTipo').value;
+  return otData.filter(o=>(!s||o.numOT.toLowerCase().includes(s)||o.area.toLowerCase().includes(s)||o.obs.toLowerCase().includes(s))&&(!e||o.estado===e)&&(!t||o.tipo===t));
+}
+function renderOTs(){
+  const f=getFiltered();
+  document.getElementById('otContainer').innerHTML=f.length?`<div class="ot-grid">${f.map(o=>`<div class="ot-card" onclick="openModal(${o.id})"><div class="card-bar"></div><div class="card-top"><div class="card-num">${o.numOT}</div><div class="badge ${o.estado==='Iniciada'?'b-ini':o.estado==='Demorada'?'b-dem':'b-cer'}">${o.estado}</div></div><div class="card-body"><div class="card-meta"><div><div class="meta-l">Tipo</div><div class="meta-v">${o.tipo}</div></div><div><div class="meta-l">Especialidad</div><div class="meta-v">${o.esp}</div></div></div><div class="card-obs">${o.obs}</div><div class="card-area">${o.area}</div></div><div class="card-foot"><div class="card-date">📅 ${o.fecha}</div><div class="icon-btn" onclick="event.stopPropagation();openModal(${o.id})">✏️</div></div></div>`).join('')}</div>`:'<div style="text-align:center;padding:40px;color:var(--text2)">Sin resultados</div>';
+}
+function openModal(id){
+  editingId=id||null;
+  document.getElementById('modalTitle').textContent=id?'Editar OT':'Nueva OT';
+  document.getElementById('delBtn').style.display=id?'block':'none';
+  if(id){const o=otData.find(x=>x.id===id);document.getElementById('f_numOT').value=o.numOT;document.getElementById('f_estado').value=o.estado;document.getElementById('f_tipo').value=o.tipo;document.getElementById('f_esp').value=o.esp;document.getElementById('f_area').value=o.area;document.getElementById('f_fecha').value=o.fecha;document.getElementById('f_obs').value=o.obs;}
+  else{document.getElementById('f_numOT').value='';document.getElementById('f_estado').value='Iniciada';document.getElementById('f_tipo').value='CORRECTIVO';document.getElementById('f_esp').value='ELECTRICIDAD';document.getElementById('f_area').value='';document.getElementById('f_fecha').value=new Date().toISOString().split('T')[0];document.getElementById('f_obs').value='';}
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('open')}
+function closeOutside(e){if(e.target.id==='overlay')closeModal()}
+function saveOT(){
+  const numOT=document.getElementById('f_numOT').value.trim();
+  if(!numOT){showToast('Número de OT obligatorio');return;}
+  const data={numOT,estado:document.getElementById('f_estado').value,tipo:document.getElementById('f_tipo').value,esp:document.getElementById('f_esp').value,area:document.getElementById('f_area').value,fecha:document.getElementById('f_fecha').value,obs:document.getElementById('f_obs').value};
+  if(editingId){const i=otData.findIndex(x=>x.id===editingId);otData[i]=data;otData[i].id=editingId;}
+  else{otData.push({id:Date.now(),...data});}
+  localStorage.setItem('otData',JSON.stringify(otData));
+  showToast('Guardado ✓');
+  closeModal();render();
+}
+function deleteOT(){
+  if(!editingId)return;
+  if(!confirm('¿Eliminar?'))return;
+  otData=otData.filter(x=>x.id!==editingId);
+  localStorage.setItem('otData',JSON.stringify(otData));
+  showToast('Eliminado');
+  closeModal();render();
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>

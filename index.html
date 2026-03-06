@@ -4,345 +4,207 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestión OT — Hospital Clínico San Cecilio</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:#0d1117; --surface:#161b22; --surface2:#1c2230; --border:#30363d;
   --accent:#1f6feb; --accent2:#388bfd; --green:#2ea043; --red:#da3633;
-  --orange:#d29922; --purple:#8957e5; --cyan:#1abc9c;
+  --orange:#d29922; --purple:#8957e5;
   --text:#e6edf3; --text2:#8b949e; --text3:#6e7681;
   --shadow:0 8px 32px rgba(0,0,0,.45);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
 
-/* ── SETUP SCREEN (oculto para modo offline) ── */
-#setupScreen{
-  display:none;align-items:center;justify-content:center;
-  min-height:100vh;padding:24px;
-}
-.setup-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:20px;
-  padding:40px;max-width:560px;width:100%;text-align:center;
-}
-.setup-card .logo{font-size:48px;margin-bottom:16px}
-.setup-card h1{font-size:22px;font-weight:700;margin-bottom:8px}
-.setup-card p{color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:24px}
-.setup-steps{text-align:left;margin-bottom:28px}
-.step{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
-.step-num{
-  width:26px;height:26px;border-radius:50%;background:var(--accent);
-  color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;
-  justify-content:center;flex-shrink:0;margin-top:1px;
-}
-.step-text{font-size:13px;color:var(--text2);line-height:1.5}
-.step-text strong{color:var(--text)}
-.url-input{
-  width:100%;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:10px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;
-  margin-bottom:16px;
-}
-.url-input:focus{outline:none;border-color:var(--accent)}
-.url-input::placeholder{color:var(--text3)}
-
-/* ── HEADER ── */
-header{
-  background:var(--surface);border-bottom:1px solid var(--border);
-  padding:0 24px;display:flex;align-items:center;justify-content:space-between;
-  height:64px;position:sticky;top:0;z-index:100;
-}
-.logo-wrap{display:flex;align-items:center;gap:12px}
-.logo-icon{
-  width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--purple));
-  border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;
-}
-.logo-wrap h1{font-size:15px;font-weight:600}
-.logo-wrap span{font-size:11px;color:var(--text2);display:block;font-weight:400}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.logo h1{font-size:14px;font-weight:600}
+.logo span{font-size:11px;color:var(--text2);display:block}
 .header-right{display:flex;gap:8px;align-items:center}
-.sync-indicator{
-  display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);
-  padding:6px 10px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:20px;
-}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
-.sync-dot.syncing{background:var(--orange);animation:pulse 1s infinite}
+.sync-pill{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);transition:background .3s}
+.sync-dot.saving{background:var(--orange);animation:pulse 1s infinite}
 .sync-dot.error{background:var(--red)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ── BUTTONS ── */
-.btn{
-  padding:8px 16px;border-radius:7px;border:1px solid var(--border);
-  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;
-  transition:all .15s;display:inline-flex;align-items:center;gap:6px;
-}
+.btn{padding:7px 14px;border-radius:7px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
 .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn-primary:hover{background:var(--accent2)}
 .btn-ghost{background:transparent;color:var(--text2)}
 .btn-ghost:hover{background:var(--surface2);color:var(--text)}
 .btn-danger{background:var(--red);border-color:var(--red);color:#fff}
-.btn-danger:hover{opacity:.85}
-.btn-sm{padding:6px 12px;font-size:12px}
+.btn-sm{padding:5px 10px;font-size:11px}
 
-/* ── CONTAINER ── */
-.container{max-width:1440px;margin:0 auto;padding:24px}
+.container{max-width:1400px;margin:0 auto;padding:20px}
 
-/* ── STATS ── */
-.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:26px}
-.stat-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:16px 18px;display:flex;align-items:center;gap:14px;
-}
-.stat-icon{
-  width:42px;height:42px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;
-}
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.stat-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
-.stat-value{font-size:24px;font-weight:700;font-family:'Space Mono',monospace;line-height:1.2}
+.stat-value{font-size:22px;font-weight:700;font-family:'Space Mono',monospace;line-height:1.2}
 
-/* ── FILTERS ── */
-.filters{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;align-items:center}
+.filters{display:flex;gap:9px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
 .search-wrap{flex:1;min-width:180px;position:relative}
-.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5}
-.search-wrap input{
-  width:100%;padding:9px 12px 9px 34px;background:var(--surface);
-  border:1px solid var(--border);border-radius:8px;color:var(--text);
-  font-family:'DM Sans',sans-serif;font-size:13px;
-}
+.search-wrap input{width:100%;padding:8px 11px 8px 32px;background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px}
 .search-wrap input:focus{outline:none;border-color:var(--accent)}
-select{
-  padding:9px 12px;background:var(--surface);border:1px solid var(--border);
-  border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;
-}
+.search-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none}
+select{padding:8px 11px;background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer}
 select:focus{outline:none;border-color:var(--accent)}
-.view-toggle{
-  display:flex;background:var(--surface);border:1px solid var(--border);
-  border-radius:8px;overflow:hidden;
-}
-.view-toggle button{
-  padding:8px 13px;background:transparent;border:none;color:var(--text2);
-  cursor:pointer;font-size:15px;transition:all .15s;
-}
+.view-toggle{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.view-toggle button{padding:7px 12px;background:transparent;border:none;color:var(--text2);cursor:pointer;font-size:15px;transition:all .15s}
 .view-toggle button.active{background:var(--accent);color:#fff}
 
-/* ── SECTION HEADER ── */
-.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-.section-head h2{font-size:14px;font-weight:600;color:var(--text2)}
-.count-pill{
-  background:var(--surface2);border:1px solid var(--border);border-radius:20px;
-  padding:2px 10px;font-size:11px;color:var(--text3);font-family:'Space Mono',monospace;
-}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.section-head h2{font-size:13px;font-weight:600;color:var(--text2)}
+.count-pill{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:2px 9px;font-size:11px;color:var(--text3);font-family:'Space Mono',monospace}
 
-/* ── CARDS GRID ── */
-.ot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:18px}
-.ot-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:14px;
-  overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;
-}
+.ot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.ot-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
 .ot-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--accent)}
 .card-bar{height:4px}
-.card-top{padding:15px 18px 10px;display:flex;justify-content:space-between;align-items:flex-start}
-.card-num{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)}
-.badges{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.badge{
-  padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.04em;
-}
-.b-iniciada{background:rgba(46,160,67,.15);color:#3fb950;border:1px solid rgba(46,160,67,.3)}
-.b-demorada{background:rgba(210,153,34,.15);color:#e3b341;border:1px solid rgba(210,153,34,.3)}
-.b-cerrada{background:rgba(139,148,158,.15);color:#8b949e;border:1px solid rgba(139,148,158,.3)}
-.b-preventivo{background:rgba(137,87,229,.15);color:#a371f7;border:1px solid rgba(137,87,229,.3)}
-.b-correctivo{background:rgba(218,54,51,.15);color:#f85149;border:1px solid rgba(218,54,51,.3)}
+.card-top{padding:13px 16px 9px;display:flex;justify-content:space-between;align-items:flex-start}
+.card-num{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2)}
+.badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.b-ini{background:rgba(46,160,67,.15);color:#3fb950;border:1px solid rgba(46,160,67,.3)}
+.b-dem{background:rgba(210,153,34,.15);color:#e3b341;border:1px solid rgba(210,153,34,.3)}
+.b-cer{background:rgba(139,148,158,.15);color:#8b949e;border:1px solid rgba(139,148,158,.3)}
+.b-pre{background:rgba(137,87,229,.15);color:#a371f7;border:1px solid rgba(137,87,229,.3)}
+.b-cor{background:rgba(218,54,51,.15);color:#f85149;border:1px solid rgba(218,54,51,.3)}
 .b-prl{background:rgba(210,153,34,.2);color:#e3b341;border:1px solid rgba(210,153,34,.4)}
 
-.card-body{padding:0 18px 14px}
-.card-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.meta-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
-.meta-val{font-size:12px;color:var(--text2);font-weight:500;margin-top:1px}
-.card-obs{
-  background:var(--surface2);border-radius:7px;padding:9px 11px;
-  font-size:11px;color:var(--text2);border-left:3px solid var(--accent);
-  line-height:1.5;margin-bottom:10px;white-space:pre-wrap;font-style:italic;
-}
-.card-informe{
-  background:rgba(46,160,67,.07);border:1px dashed rgba(46,160,67,.3);
-  border-radius:7px;padding:9px 11px;font-size:11px;color:#3fb950;margin-bottom:10px;
-}
-.card-informe-empty{
-  background:var(--surface2);border:1px dashed var(--border);
-  border-radius:7px;padding:8px 11px;font-size:11px;color:var(--text3);
-  margin-bottom:10px;text-align:center;
-}
-.card-area{font-size:12px;color:var(--text);font-weight:500}
-.card-demora{font-size:11px;color:#e3b341;margin-bottom:8px}
-.card-foot{
-  padding:10px 18px;border-top:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;
-}
+.card-body{padding:0 16px 12px}
+.card-meta{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.meta-l{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.meta-v{font-size:11px;color:var(--text2);font-weight:500;margin-top:1px}
+.card-obs{background:var(--surface2);border-radius:7px;padding:8px 10px;font-size:11px;color:var(--text2);border-left:3px solid var(--accent);line-height:1.5;margin-bottom:9px;white-space:pre-wrap;font-style:italic}
+.card-inf{background:rgba(46,160,67,.07);border:1px dashed rgba(46,160,67,.3);border-radius:7px;padding:8px 10px;font-size:11px;color:#3fb950;margin-bottom:9px}
+.card-inf-empty{background:var(--surface2);border:1px dashed var(--border);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--text3);margin-bottom:9px;text-align:center}
+.card-area{font-size:11px;color:var(--text);font-weight:500}
+.card-demora{font-size:10px;color:#e3b341;margin-bottom:7px}
+.card-foot{padding:9px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .card-date{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace}
-.card-actions{display:flex;gap:5px}
-.icon-btn{
-  width:28px;height:28px;border-radius:6px;border:1px solid var(--border);
-  background:transparent;color:var(--text2);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;
-}
+.card-acts{display:flex;gap:4px}
+.icon-btn{width:27px;height:27px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
 .icon-btn:hover{background:var(--surface2);color:var(--text)}
 
-/* ── TABLE ── */
-.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:auto}
 .ot-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.ot-tbl th{
-  padding:11px 14px;text-align:left;font-size:10px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.06em;color:var(--text2);
-  background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;
-}
-.ot-tbl td{padding:13px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.ot-tbl th{padding:10px 13px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap}
+.ot-tbl td{padding:11px 13px;border-bottom:1px solid var(--border);vertical-align:middle}
 .ot-tbl tr:last-child td{border-bottom:none}
 .ot-tbl tr:hover td{background:rgba(31,111,235,.05)}
 
-/* ── MODAL ── */
-.overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
-  display:flex;align-items:center;justify-content:center;padding:20px;
-  backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s;
-}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s}
 .overlay.open{opacity:1;pointer-events:all}
-.modal{
-  background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  width:100%;max-width:720px;max-height:91vh;overflow-y:auto;
-  transform:scale(.96);transition:transform .2s;
-}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:15px;width:100%;max-width:700px;max-height:92vh;overflow-y:auto;transform:scale(.96);transition:transform .2s}
 .overlay.open .modal{transform:scale(1)}
-.modal-hd{
-  padding:18px 24px 14px;border-bottom:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;
-  position:sticky;top:0;background:var(--surface);z-index:1;
-}
-.modal-hd h2{font-size:16px;font-weight:600}
-.close-btn{
-  width:30px;height:30px;border-radius:7px;border:1px solid var(--border);
-  background:transparent;color:var(--text2);cursor:pointer;font-size:17px;
-  display:flex;align-items:center;justify-content:center;
-}
+.modal-hd{padding:16px 22px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-hd h2{font-size:15px;font-weight:600}
+.close-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
 .close-btn:hover{background:var(--surface2);color:var(--text)}
-.modal-bd{padding:22px 24px}
-.modal-ft{
-  padding:14px 24px;border-top:1px solid var(--border);
-  display:flex;justify-content:flex-end;gap:8px;
-}
-.f-section{margin-bottom:20px}
-.f-section-title{
-  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
-  color:var(--text3);padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:14px;
-}
-.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.f-group{display:flex;flex-direction:column;gap:5px}
+.modal-bd{padding:20px 22px}
+.modal-ft{padding:12px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.f-sec{margin-bottom:18px}
+.f-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);padding-bottom:9px;border-bottom:1px solid var(--border);margin-bottom:13px}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f-group{display:flex;flex-direction:column;gap:4px}
 .f-group.full{grid-column:1/-1}
-.f-group label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
-.f-group input,.f-group select,.f-group textarea{
-  padding:9px 11px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
-  transition:border-color .15s;
-}
-.f-group input:focus,.f-group select:focus,.f-group textarea:focus{
-  outline:none;border-color:var(--accent);background:var(--bg);
-}
-.f-group textarea{resize:vertical;min-height:76px}
+.f-group label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
+.f-group input,.f-group select,.f-group textarea{padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color .15s}
+.f-group input:focus,.f-group select:focus,.f-group textarea:focus{outline:none;border-color:var(--accent);background:var(--bg)}
+.f-group textarea{resize:vertical;min-height:72px}
 
-/* ── EMPTY ── */
-.empty{grid-column:1/-1;text-align:center;padding:72px 20px;color:var(--text3)}
-.empty .ico{font-size:46px;margin-bottom:14px}
-.empty h3{font-size:17px;color:var(--text2);margin-bottom:6px}
+.empty{text-align:center;padding:64px 20px;color:var(--text3)}
+.empty .ico{font-size:44px;margin-bottom:12px}
+.empty h3{font-size:16px;color:var(--text2);margin-bottom:5px}
 
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:22px;right:22px;padding:12px 18px;border-radius:10px;
-  font-size:13px;font-weight:500;z-index:9999;
-  transform:translateY(70px);opacity:0;transition:all .3s;pointer-events:none;
-}
+.toast{position:fixed;bottom:20px;right:20px;padding:11px 17px;border-radius:9px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(70px);opacity:0;transition:all .3s;pointer-events:none;max-width:340px}
 .toast.show{transform:translateY(0);opacity:1}
 
-/* ── LOADING ── */
-.loading-wrap{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:80px;gap:16px;color:var(--text2);
-}
-.spinner{
-  width:36px;height:36px;border:3px solid var(--border);
-  border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* API DOCS panel */
+.api-panel{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:18px 20px;margin-bottom:20px}
+.api-panel h3{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--accent2)}
+.api-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Space Mono',monospace;font-size:11px;color:#a371f7;line-height:1.7;margin-bottom:10px;overflow-x:auto;white-space:pre}
+.api-desc{font-size:12px;color:var(--text2);margin-bottom:8px}
 
-/* ── RESPONSIVE ── */
-@media(max-width:768px){
+@media(max-width:700px){
   .stats-bar{grid-template-columns:1fr 1fr}
   .ot-grid{grid-template-columns:1fr}
   .f-grid{grid-template-columns:1fr}
-  header{padding:0 14px}
-  .container{padding:14px}
+  header{padding:0 12px}
+  .container{padding:12px}
 }
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--text3)}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════
-     SETUP SCREEN — shown until URL is configured
-═══════════════════════════════════════════════ -->
-<div id="setupScreen">
-  <div class="setup-card">
-    <div class="logo">🏥</div>
-    <h1>Configuración inicial</h1>
-    <p>Para conectar el dashboard con tu Google Sheet necesitas pegar la URL del Apps Script desplegado.</p>
-    <div class="setup-steps">
-      <div class="step"><div class="step-num">1</div><div class="step-text">Sube el Excel a <strong>Google Drive</strong> y ábrelo como <strong>Google Sheets</strong></div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-text">Ve a <strong>Extensiones → Apps Script</strong> y pega el contenido de <strong>apps_script.gs</strong></div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-text">Haz clic en <strong>Desplegar → Nueva implementación</strong> → Tipo: <strong>Aplicación web</strong> → Acceso: <strong>Cualquier persona</strong></div></div>
-      <div class="step"><div class="step-num">4</div><div class="step-text">Copia la <strong>URL de implementación</strong> y pégala aquí abajo</div></div>
-    </div>
-    <input class="url-input" id="scriptUrlInput" type="url"
-           placeholder="https://script.google.com/macros/s/XXXXX.../exec"
-           value="">
-    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveUrl()">
-      ✅ Conectar y abrir dashboard
-    </button>
-    <p style="margin-top:14px;font-size:12px;color:var(--text3)">La URL se guarda en tu navegador. Solo necesitas configurarlo una vez.</p>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════
-     MAIN APP
-═══════════════════════════════════════════════ -->
-<div id="app" style="display:none">
-
 <header>
-  <div class="logo-wrap">
+  <div class="logo">
     <div class="logo-icon">🏥</div>
     <div>
-      <h1>Gestión OT</h1>
-      <span>Hospital U. Clínico San Cecilio</span>
+      <h1>Gestión OT — HCSC</h1>
+      <span>isivoltpro-stack / isivolt-mantenimiento</span>
     </div>
   </div>
   <div class="header-right">
-    <div class="sync-indicator">
+    <div class="sync-pill">
       <div class="sync-dot" id="syncDot"></div>
-      <span id="syncLabel">Conectado</span>
+      <span id="syncLabel">Sincronizado</span>
     </div>
-    <button class="btn btn-ghost btn-sm" onclick="loadOTs()">↻ Actualizar</button>
-    <button class="btn btn-ghost btn-sm" onclick="resetUrl()">⚙️</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadFromGitHub()">↻</button>
+    <button class="btn btn-ghost btn-sm" onclick="toggleApiDocs()">⚙️ API</button>
     <button class="btn btn-primary btn-sm" onclick="openModal()">+ Nueva OT</button>
   </div>
 </header>
 
 <div class="container">
 
+  <!-- API DOCS para OpenClaw -->
+  <div class="api-panel" id="apiPanel" style="display:none">
+    <h3>🤖 Endpoints para OpenClaw</h3>
+    <div class="api-desc">OpenClaw puede llamar directamente a la API de GitHub para modificar los datos. Usa estos ejemplos:</div>
+
+    <div class="api-desc"><strong>➕ Añadir nueva OT:</strong></div>
+    <div class="api-block">POST https://api.github.com/repos/isivoltpro-stack/isivolt-mantenimiento/contents/data.json
+Headers:
+  Authorization: token TU_TOKEN_AQUI
+  Content-Type: application/json
+
+Body: { "action": "create", "ot": {
+  "numOT": "2026/XXXXX",
+  "estado": "Iniciada",
+  "tipoIntervencion": "PREVENTIVO",
+  "tipoOT": "Instalación",
+  "especialidad": "ELECTRICIDAD",
+  "area": "Planta / Servicio",
+  "observaciones": "Descripción del trabajo",
+  "informe": "",
+  "prl": "No"
+}}</div>
+
+    <div class="api-desc"><strong>✏️ Modificar OT existente:</strong></div>
+    <div class="api-block">POST https://api.github.com/repos/isivoltpro-stack/isivolt-mantenimiento/contents/data.json
+Body: { "action": "update", "numOT": "2026/11917", "changes": {
+  "estado": "Cerrada",
+  "informe": "Trabajo realizado. Todo correcto.",
+  "situacionFinal": "Resuelto"
+}}</div>
+
+    <div class="api-desc"><strong>🗑 Eliminar OT:</strong></div>
+    <div class="api-block">POST ... Body: { "action": "delete", "numOT": "2026/11917" }</div>
+    <button class="btn btn-ghost btn-sm" onclick="toggleApiDocs()">Cerrar</button>
+  </div>
+
   <div class="stats-bar" id="statsBar"></div>
 
   <div class="filters">
     <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span class="search-ico">🔍</span>
       <input type="text" id="searchInput" placeholder="Buscar OT, área, descripción..." oninput="renderOTs()">
     </div>
     <select id="fEstado" onchange="renderOTs()">
@@ -353,14 +215,12 @@ select:focus{outline:none;border-color:var(--accent)}
       <option value="">Todos los tipos</option>
       <option>PREVENTIVO</option><option>CORRECTIVO</option>
     </select>
-    <select id="fEspec" onchange="renderOTs()">
-      <option value="">Todas las especialidades</option>
-      <option>ELECTRICIDAD</option><option>FONTANERIA</option>
-      <option>CLIMATIZACION</option><option>OTROS</option>
+    <select id="fArea" onchange="renderOTs()">
+      <option value="">Todas las áreas</option>
     </select>
     <div class="view-toggle">
-      <button id="btnGrid" class="active" onclick="setView('grid')" title="Tarjetas">⊞</button>
-      <button id="btnTable" onclick="setView('table')" title="Tabla">☰</button>
+      <button id="btnGrid" class="active" onclick="setView('grid')">⊞</button>
+      <button id="btnTable" onclick="setView('table')">☰</button>
     </div>
   </div>
 
@@ -369,56 +229,46 @@ select:focus{outline:none;border-color:var(--accent)}
     <span class="count-pill" id="otCount">—</span>
   </div>
 
-  <div id="otContainer"></div>
-
+  <div id="otContainer">
+    <div class="empty"><div class="ico">⏳</div><h3>Cargando datos...</h3></div>
+  </div>
 </div>
-</div><!-- /#app -->
 
-<!-- ═══ MODAL ═══ -->
+<!-- MODAL -->
 <div class="overlay" id="overlay" onclick="closeOutside(event)">
-  <div class="modal" id="modal">
+  <div class="modal">
     <div class="modal-hd">
       <h2 id="modalTitle">Nueva OT</h2>
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-bd">
-
-      <div class="f-section">
-        <div class="f-section-title">📋 Identificación</div>
+      <div class="f-sec">
+        <div class="f-sec-title">📋 Identificación</div>
         <div class="f-grid">
-          <div class="f-group"><label>Número OT *</label><input id="f_numOT" placeholder="2026/XXXXX" required></div>
+          <div class="f-group"><label>Número OT *</label><input id="f_numOT" placeholder="2026/XXXXX"></div>
           <div class="f-group"><label>Estado OT</label>
-            <select id="f_estado"><option>Iniciada</option><option>Demorada</option><option>Cerrada</option></select>
-          </div>
+            <select id="f_estado"><option>Iniciada</option><option>Demorada</option><option>Cerrada</option></select></div>
           <div class="f-group"><label>Tipo Intervención</label>
-            <select id="f_tipoIntervencion"><option>PREVENTIVO</option><option>CORRECTIVO</option></select>
-          </div>
+            <select id="f_tipoIntervencion"><option>PREVENTIVO</option><option>CORRECTIVO</option></select></div>
           <div class="f-group"><label>Tipo OT</label>
-            <select id="f_tipoOT"><option>Instalación</option><option>Correctivo</option><option>Preventivo</option></select>
-          </div>
-          <div class="f-group"><label>Num Aviso</label><input id="f_numAviso" placeholder="2026/XXXXX"></div>
+            <select id="f_tipoOT"><option>Instalación</option><option>Correctivo</option><option>Preventivo</option></select></div>
+          <div class="f-group"><label>Num Aviso</label><input id="f_numAviso"></div>
           <div class="f-group"><label>Contacto</label><input id="f_contacto" placeholder="Nombre — Teléfono"></div>
         </div>
       </div>
-
-      <div class="f-section">
-        <div class="f-section-title">🏗️ Instalación</div>
+      <div class="f-sec">
+        <div class="f-sec-title">🏗️ Instalación</div>
         <div class="f-grid">
           <div class="f-group"><label>Especialidad</label>
-            <select id="f_especialidad">
-              <option>ELECTRICIDAD</option><option>FONTANERIA</option>
-              <option>CLIMATIZACION</option><option>OTROS</option>
-            </select>
-          </div>
+            <select id="f_especialidad"><option>ELECTRICIDAD</option><option>FONTANERIA</option><option>CLIMATIZACION</option><option>OTROS</option></select></div>
           <div class="f-group"><label>Departamento</label><input id="f_departamento"></div>
-          <div class="f-group"><label>Grupo Instalación</label><input id="f_grupoInsta" placeholder="Ej: ASCENSORES"></div>
-          <div class="f-group"><label>SubGrupo Instalación</label><input id="f_subGrupoInsta" placeholder="Ej: OTROS"></div>
-          <div class="f-group full"><label>Centro de Consumo / Área</label><input id="f_area" placeholder="Planta, Quirófano, Servicio..."></div>
+          <div class="f-group"><label>Grupo Instalación</label><input id="f_grupoInsta"></div>
+          <div class="f-group"><label>SubGrupo Instalación</label><input id="f_subGrupoInsta"></div>
+          <div class="f-group full"><label>Centro de Consumo / Área</label><input id="f_area"></div>
         </div>
       </div>
-
-      <div class="f-section">
-        <div class="f-section-title">📅 Fechas</div>
+      <div class="f-sec">
+        <div class="f-sec-title">📅 Fechas</div>
         <div class="f-grid">
           <div class="f-group"><label>Fecha Aviso</label><input type="datetime-local" id="f_fechaAviso"></div>
           <div class="f-group"><label>Fecha Lanzamiento</label><input type="datetime-local" id="f_fechaLanza"></div>
@@ -426,44 +276,33 @@ select:focus{outline:none;border-color:var(--accent)}
           <div class="f-group"><label>Fecha Fin Intervención</label><input type="datetime-local" id="f_fechaFinInter"></div>
         </div>
       </div>
-
-      <div class="f-section">
-        <div class="f-section-title">⚙️ Detalle</div>
+      <div class="f-sec">
+        <div class="f-sec-title">⚙️ Detalle</div>
         <div class="f-grid">
           <div class="f-group"><label>Tipo Avería</label><input id="f_tipoAveria"></div>
           <div class="f-group"><label>Situación Final</label>
-            <select id="f_situacionFinal">
-              <option value="">— Sin asignar —</option>
-              <option>Resuelto</option><option>Pendiente</option><option>En proceso</option>
-            </select>
-          </div>
-          <div class="f-group full"><label>Motivo Demora</label><input id="f_motivoDemora" placeholder="Ej: Pendiente estudio técnico"></div>
-          <div class="f-group"><label>Valor Contador</label><input type="number" id="f_contador" placeholder="0.000" step="0.001"></div>
+            <select id="f_situacionFinal"><option value="">— Sin asignar —</option><option>Resuelto</option><option>Pendiente</option><option>En proceso</option></select></div>
+          <div class="f-group full"><label>Motivo Demora</label><input id="f_motivoDemora"></div>
           <div class="f-group"><label>PRL</label>
-            <select id="f_prl"><option>Sí</option><option>No</option></select>
-          </div>
-          <div class="f-group"><label>Nº Serie Activo</label><input id="f_numSerie"></div>
+            <select id="f_prl"><option>No</option><option>Sí</option></select></div>
+          <div class="f-group"><label>Nº Serie</label><input id="f_numSerie"></div>
         </div>
       </div>
-
-      <div class="f-section">
-        <div class="f-section-title">📝 Texto</div>
+      <div class="f-sec">
+        <div class="f-sec-title">📝 Texto</div>
         <div class="f-grid">
           <div class="f-group full"><label>Observaciones de la OT</label>
-            <textarea id="f_observaciones" rows="3" placeholder="ASCENSORES&#10;LUN(T); MAR(T); MIÉ(T)..."></textarea>
-          </div>
+            <textarea id="f_observaciones" rows="3"></textarea></div>
           <div class="f-group full"><label>📄 Informe del Técnico</label>
-            <textarea id="f_informe" rows="4" placeholder="Diagnóstico, acciones realizadas, materiales usados..."></textarea>
-          </div>
+            <textarea id="f_informe" rows="4" placeholder="Diagnóstico, acciones realizadas, materiales..."></textarea></div>
         </div>
       </div>
-
     </div>
     <div class="modal-ft">
       <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-danger" id="deleteBtn" onclick="deleteCurrentOT()" style="display:none">🗑 Eliminar</button>
       <button class="btn btn-primary" id="saveBtn" onclick="saveOT()">
-        <span id="saveBtnText">💾 Guardar OT</span>
+        <span id="saveBtnTxt">💾 Guardar OT</span>
       </button>
     </div>
   </div>
@@ -472,100 +311,95 @@ select:focus{outline:none;border-color:var(--accent)}
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════
-//  CONFIG
-// ══════════════════════════════════════════
-let SCRIPT_URL = localStorage.getItem('ot_script_url') || '';
+// ══════════════════════════════════════════════════════
+//  GITHUB CONFIG
+// ══════════════════════════════════════════════════════
+const GH = {
+  owner: 'isivoltpro-stack',
+  repo:  'isivolt-mantenimiento',
+  file:  'data.json',
+  token: 'TU_TOKEN_AQUI',
+  get api() { return `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${this.file}`; }
+};
+
 let otData = [];
-let editingRow = null;   // sheet row number (1-based)
-let editingIdx = null;   // index in otData array
+let fileSha = '';   // GitHub needs SHA to update files
+let editingId = null;
 let view = 'grid';
 
-// ── Setup screen ──────────────────────────
-function saveUrl() {
-  const url = document.getElementById('scriptUrlInput').value.trim();
-  if (!url.startsWith('https://script.google.com')) {
-    toast('Pega la URL correcta de Apps Script', 'error'); return;
+// ══════════════════════════════════════════════════════
+//  GITHUB API — READ
+// ══════════════════════════════════════════════════════
+async function loadFromGitHub() {
+  setSyncState('saving', 'Cargando...');
+  try {
+    const res = await fetch(GH.api + '?t=' + Date.now(), {
+      headers: { Authorization: `token ${GH.token}` }
+    });
+    if (!res.ok) throw new Error('Error ' + res.status);
+    const json = await res.json();
+    fileSha = json.sha;
+    otData = JSON.parse(atob(json.content.replace(/\n/g,'')));
+    setSyncState('ok', 'Sincronizado');
+    render();
+  } catch(e) {
+    setSyncState('error', 'Error de red');
+    showToast('❌ No se pudo cargar: ' + e.message, 'error');
   }
-  SCRIPT_URL = url;
-  localStorage.setItem('ot_script_url', url);
-  startApp();
 }
 
-function resetUrl() {
-  localStorage.removeItem('ot_script_url');
-  SCRIPT_URL = '';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('setupScreen').style.display = 'flex';
+// ══════════════════════════════════════════════════════
+//  GITHUB API — WRITE
+// ══════════════════════════════════════════════════════
+async function saveToGitHub(msg) {
+  setSyncState('saving', 'Guardando...');
+  try {
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(otData, null, 2))));
+    const body = { message: msg || 'Update OTs', content, sha: fileSha };
+    const res = await fetch(GH.api, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${GH.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || res.status);
+    }
+    const json = await res.json();
+    fileSha = json.content.sha;
+    setSyncState('ok', 'Guardado ✓');
+    return true;
+  } catch(e) {
+    setSyncState('error', 'Error al guardar');
+    showToast('❌ Error al guardar: ' + e.message, 'error');
+    return false;
+  }
 }
 
-function startApp() {
-  document.getElementById('setupScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  loadOTs();
-}
-
-// ── API calls ─────────────────────────────
-function setSyncState(state) {
+// ══════════════════════════════════════════════════════
+//  SYNC STATE
+// ══════════════════════════════════════════════════════
+function setSyncState(state, label) {
   const dot = document.getElementById('syncDot');
   const lbl = document.getElementById('syncLabel');
-  dot.className = 'sync-dot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
-  lbl.textContent = state === 'syncing' ? 'Sincronizando...' : state === 'error' ? 'Error' : 'Conectado';
+  dot.className = 'sync-dot' + (state==='saving'?' saving':state==='error'?' error':'');
+  lbl.textContent = label;
 }
 
-// Datos locales de incidencias (sin API)
-const otDataLocal = [
-  {numOT:"INC-001",estadoOT:"Pendiente",tipoIntervencion:"CORRECTIVO",tipoOT:"URGENTE",especialidad:"ELECTRICIDAD",area:"Planta 1 - Pediatría",fechaAviso:"05/03/2026",observaciones:"Pantalla no funciona Planta 1 Pediatría"},
-  {numOT:"INC-002",estadoOT:"Pendiente",tipoIntervencion:"CORRECTIVO",tipoOT:"ALTA",especialidad:"ELECTRICIDAD",area:"Planta 0 - Cocina",fechaAviso:"05/03/2026",observaciones:"4 puntos enchufe Cocina - Presupuesto: 742€"},
-  {numOT:"INC-003",estadoOT:"Cerrada",tipoIntervencion:"CORRECTIVO",tipoOT:"MEDIA",especialidad:"FONTANERÍA",area:"-",fechaAviso:"05/03/2026",observaciones:"Tubería con posible fuga"},
-  {numOT:"INC-004",estadoOT:"Cerrada",tipoIntervencion:"CORRECTIVO",tipoOT:"MEDIA",especialidad:"ELECTRICIDAD",area:"-",fechaAviso:"05/03/2026",observaciones:"Luminaria descolgada"},
-  {numOT:"INC-005",estadoOT:"Cerrada",tipoIntervencion:"CORRECTIVO",tipoOT:"MEDIA-ALTA",especialidad:"FONTANERÍA",area:"-",fechaAviso:"05/03/2026",observaciones:"Sifón con posible fuga"},
-  {numOT:"INC-006",estadoOT:"Cerrada",tipoIntervencion:"CORRECTIVO",tipoOT:"ALTA",especialidad:"ELECTRICIDAD",area:"-",fechaAviso:"05/03/2026",observaciones:"Enchufe quemado (URGENTE)"},
-  {numOT:"CUR-001",estadoOT:"Cerrada",tipoIntervencion:"PREVENTIVO",tipoOT:"BAJA",especialidad:"FORMACIÓN",area:"Sala Docencia P5",fechaAviso:"05/03/2026",observaciones:"Curso instalaciones eléctricas - 10/03/2026 16:00"}
-];
-
-// Usar datos locales directamente
-function loadOTs() {
-  setSyncState('ok');
-  otData = otDataLocal;
-  renderStats();
-  renderOTs();
-}
-
-async function apiPost(body) {
-  setSyncState('syncing');
-  const res = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify(body)
-  });
-  const json = await res.json();
-  setSyncState(json.ok ? 'ok' : 'error');
-  return json;
-}
-
-// ══════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  RENDER
-// ══════════════════════════════════════════
-function getFiltered() {
-  const s = document.getElementById('searchInput').value.toLowerCase();
-  const e = document.getElementById('fEstado').value;
-  const t = document.getElementById('fTipo').value;
-  const es = document.getElementById('fEspec').value;
-  return otData.filter(o =>
-    (!s || [o.numOT,o.observaciones,o.area,o.contacto].join(' ').toLowerCase().includes(s)) &&
-    (!e || o.estado === e) &&
-    (!t || o.tipoIntervencion === t) &&
-    (!es || o.especialidad === es)
-  );
-}
+// ══════════════════════════════════════════════════════
+function render() { renderStats(); renderAreas(); renderOTs(); }
 
 function renderStats() {
-  const t = otData.length;
-  const ini = otData.filter(o=>o.estado==='Iniciada').length;
-  const dem = otData.filter(o=>o.estado==='Demorada').length;
-  const cer = otData.filter(o=>o.estado==='Cerrada').length;
-  const prev = otData.filter(o=>o.tipoIntervencion==='PREVENTIVO').length;
-  document.getElementById('statsBar').innerHTML = [
+  const t=otData.length, ini=otData.filter(o=>o.estado==='Iniciada').length,
+        dem=otData.filter(o=>o.estado==='Demorada').length,
+        cer=otData.filter(o=>o.estado==='Cerrada').length,
+        prev=otData.filter(o=>o.tipoIntervencion==='PREVENTIVO').length;
+  document.getElementById('statsBar').innerHTML=[
     ['rgba(31,111,235,.15)','📋','Total OTs',t,'var(--accent2)'],
     ['rgba(46,160,67,.15)','✅','Iniciadas',ini,'#3fb950'],
     ['rgba(210,153,34,.15)','⏳','Demoradas',dem,'#e3b341'],
@@ -578,66 +412,56 @@ function renderStats() {
     </div>`).join('');
 }
 
+function renderAreas() {
+  const areas=[...new Set(otData.map(o=>o.area).filter(Boolean))].sort();
+  const sel=document.getElementById('fArea'), cur=sel.value;
+  sel.innerHTML='<option value="">Todas las áreas</option>'+
+    areas.map(a=>`<option ${a===cur?'selected':''}>${a}</option>`).join('');
+}
+
+function getFiltered() {
+  const s=document.getElementById('searchInput').value.toLowerCase(),
+        e=document.getElementById('fEstado').value,
+        t=document.getElementById('fTipo').value,
+        a=document.getElementById('fArea').value;
+  return otData.filter(o=>
+    (!s||[o.numOT,o.observaciones,o.area,o.contacto,o.grupoInsta].join(' ').toLowerCase().includes(s))&&
+    (!e||o.estado===e)&&(!t||o.tipoIntervencion===t)&&(!a||o.area===a));
+}
+
 function renderOTs() {
-  const filtered = getFiltered();
-  document.getElementById('otCount').textContent = `${filtered.length} OT${filtered.length!==1?'s':''}`;
-  const c = document.getElementById('otContainer');
-  if (view === 'grid') {
-    if (!filtered.length) {
-      c.innerHTML = `<div class="ot-grid"><div class="empty"><div class="ico">📭</div><h3>Sin resultados</h3><p>Prueba otros filtros o añade una OT</p></div></div>`;
-      return;
-    }
-    c.innerHTML = `<div class="ot-grid">${filtered.map(cardHTML).join('')}</div>`;
-  } else {
-    c.innerHTML = tableHTML(filtered);
-  }
+  const f=getFiltered();
+  document.getElementById('otCount').textContent=`${f.length} OT${f.length!==1?'s':''}`;
+  const c=document.getElementById('otContainer');
+  if (view==='grid') {
+    c.innerHTML=f.length?`<div class="ot-grid">${f.map(cardHTML).join('')}</div>`:emptyHTML();
+  } else { c.innerHTML=tableHTML(f); }
 }
 
-function accentBar(o) {
-  if (o.tipoIntervencion==='CORRECTIVO') return 'background:linear-gradient(90deg,#da3633,#b91c1c)';
-  if (o.tipoIntervencion==='PREVENTIVO') return 'background:linear-gradient(90deg,#8957e5,#6e40c9)';
-  return 'background:linear-gradient(90deg,#1f6feb,#1e40af)';
-}
+function emptyHTML(){return`<div class="empty"><div class="ico">📭</div><h3>Sin resultados</h3><p>Prueba otros filtros o añade una nueva OT</p></div>`}
 
-function estadoBadge(e) {
-  const m={'Iniciada':'b-iniciada','Demorada':'b-demorada','Cerrada':'b-cerrada'};
-  return `<span class="badge ${m[e]||''}">${e}</span>`;
-}
-function tipoBadge(t) {
-  return `<span class="badge ${t==='PREVENTIVO'?'b-preventivo':'b-correctivo'}">${t==='PREVENTIVO'?'Preventivo':'Correctivo'}</span>`;
-}
-function fmtDate(d) {
-  if (!d) return '—';
-  try {
-    const dt = new Date(d.replace(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2})/,'$3-$2-$1T$4'));
-    if (isNaN(dt)) return d;
-    return dt.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+
-           dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-  } catch{ return d; }
-}
+function accentBar(o){return o.tipoIntervencion==='CORRECTIVO'?'background:linear-gradient(90deg,#da3633,#b91c1c)':'background:linear-gradient(90deg,#8957e5,#6e40c9)'}
+function eBadge(e){const m={Iniciada:'b-ini',Demorada:'b-dem',Cerrada:'b-cer'};return`<span class="badge ${m[e]||''}">${e}</span>`}
+function tBadge(t){return`<span class="badge ${t==='PREVENTIVO'?'b-pre':'b-cor'}">${t==='PREVENTIVO'?'Preventivo':'Correctivo'}</span>`}
+function fmtDate(d){if(!d)return'—';return d.replace('T',' ').substring(0,16)}
 
 function cardHTML(o) {
-  const idx = otData.indexOf(o);
-  const obs = (o.observaciones||'').substring(0,130) + ((o.observaciones||'').length>130?'…':'');
-  const infBlock = o.informe
-    ? `<div class="card-informe">📄 ${o.informe.substring(0,100)}${o.informe.length>100?'…':''}</div>`
-    : `<div class="card-informe-empty">📄 Sin informe — edita para añadir</div>`;
-  return `
-  <div class="ot-card" onclick="openModal(${idx})">
+  const obs=(o.observaciones||'').substring(0,120)+((o.observaciones||'').length>120?'…':'');
+  const infBlock=o.informe
+    ?`<div class="card-inf">📄 ${o.informe.substring(0,90)}${o.informe.length>90?'…':''}</div>`
+    :`<div class="card-inf-empty">📄 Sin informe — edita para añadir</div>`;
+  return`<div class="ot-card" onclick="openModal(${o.id})">
     <div class="card-bar" style="${accentBar(o)}"></div>
     <div class="card-top">
       <div class="card-num">${o.numOT}</div>
-      <div class="badges">
-        ${o.prl==='Sí'?'<span class="badge b-prl">⚠️ PRL</span>':''}
-        ${estadoBadge(o.estado)}
-      </div>
+      <div class="badges">${o.prl==='Sí'?'<span class="badge b-prl">⚠️ PRL</span>':''}${eBadge(o.estado)}</div>
     </div>
     <div class="card-body">
       <div class="card-meta">
-        <div><div class="meta-lbl">Tipo</div><div class="meta-val">${tipoBadge(o.tipoIntervencion)}</div></div>
-        <div><div class="meta-lbl">Especialidad</div><div class="meta-val">${o.especialidad||'—'}</div></div>
-        <div><div class="meta-lbl">Grupo Inst.</div><div class="meta-val">${o.grupoInsta||'—'}</div></div>
-        <div><div class="meta-lbl">Tipo OT</div><div class="meta-val">${o.tipoOT||'—'}</div></div>
+        <div><div class="meta-l">Tipo</div><div class="meta-v">${tBadge(o.tipoIntervencion)}</div></div>
+        <div><div class="meta-l">Especialidad</div><div class="meta-v">${o.especialidad||'—'}</div></div>
+        <div><div class="meta-l">Grupo</div><div class="meta-v">${o.grupoInsta||'—'}</div></div>
+        <div><div class="meta-l">Tipo OT</div><div class="meta-v">${o.tipoOT||'—'}</div></div>
       </div>
       ${obs?`<div class="card-obs">${obs}</div>`:''}
       ${infBlock}
@@ -646,172 +470,121 @@ function cardHTML(o) {
     </div>
     <div class="card-foot">
       <div class="card-date">📅 ${fmtDate(o.fechaLanza)}</div>
-      <div class="card-actions" onclick="event.stopPropagation()">
-        <button class="icon-btn" onclick="openModal(${idx})" title="Editar">✏️</button>
-        <button class="icon-btn" onclick="confirmDelete(${idx})" title="Eliminar">🗑</button>
+      <div class="card-acts" onclick="event.stopPropagation()">
+        <button class="icon-btn" onclick="openModal(${o.id})">✏️</button>
+        <button class="icon-btn" onclick="confirmDelete(${o.id})">🗑</button>
       </div>
     </div>
   </div>`;
 }
 
 function tableHTML(data) {
-  if (!data.length) return `<div class="empty"><div class="ico">📭</div><h3>Sin resultados</h3></div>`;
-  return `<div class="tbl-wrap"><table class="ot-tbl"><thead><tr>
+  if(!data.length)return emptyHTML();
+  return`<div class="tbl-wrap"><table class="ot-tbl"><thead><tr>
     <th>Num OT</th><th>Estado</th><th>Tipo</th><th>Especialidad</th>
     <th>Área</th><th>Observaciones</th><th>Fecha Lanza.</th><th>Informe</th><th></th>
-  </tr></thead><tbody>${data.map(o=>{
-    const idx=otData.indexOf(o);
-    return `<tr>
-      <td><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--accent2)">${o.numOT}</span></td>
-      <td>${estadoBadge(o.estado)}</td>
-      <td>${tipoBadge(o.tipoIntervencion)}</td>
-      <td style="font-size:11px">${o.especialidad||'—'}</td>
-      <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${o.area||'—'}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${(o.observaciones||'').replace(/\n/g,' ')}</td>
-      <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3)">${fmtDate(o.fechaLanza)}</td>
-      <td style="font-size:11px;color:${o.informe?'#3fb950':'var(--text3)'}">${o.informe?'✅ Sí':'—'}</td>
-      <td><div style="display:flex;gap:4px">
-        <button class="icon-btn" onclick="openModal(${idx})">✏️</button>
-        <button class="icon-btn" onclick="confirmDelete(${idx})">🗑</button>
-      </div></td>
-    </tr>`;
-  }).join('')}</tbody></table></div>`;
+  </tr></thead><tbody>${data.map(o=>`<tr>
+    <td><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--accent2)">${o.numOT}</span></td>
+    <td>${eBadge(o.estado)}</td><td>${tBadge(o.tipoIntervencion)}</td>
+    <td style="font-size:11px">${o.especialidad||'—'}</td>
+    <td style="max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${o.area||'—'}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--text2)">${(o.observaciones||'').replace(/\n/g,' ')}</td>
+    <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3)">${fmtDate(o.fechaLanza)}</td>
+    <td style="font-size:11px;color:${o.informe?'#3fb950':'var(--text3)'}">${o.informe?'✅ Sí':'—'}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="icon-btn" onclick="openModal(${o.id})">✏️</button>
+      <button class="icon-btn" onclick="confirmDelete(${o.id})">🗑</button>
+    </div></td>
+  </tr>`).join('')}</tbody></table></div>`;
 }
 
-// ══════════════════════════════════════════
-//  VIEW TOGGLE
-// ══════════════════════════════════════════
-function setView(v) {
-  view = v;
-  document.getElementById('btnGrid').classList.toggle('active', v==='grid');
-  document.getElementById('btnTable').classList.toggle('active', v==='table');
-  renderOTs();
-}
+function setView(v){view=v;document.getElementById('btnGrid').classList.toggle('active',v==='grid');document.getElementById('btnTable').classList.toggle('active',v==='table');renderOTs()}
 
-// ══════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  MODAL
-// ══════════════════════════════════════════
-function openModal(idx) {
-  editingIdx = (idx !== undefined) ? idx : null;
-  editingRow = null;
-  const isEdit = editingIdx !== null;
-  document.getElementById('modalTitle').textContent = isEdit ? `Editar OT — ${otData[idx].numOT}` : 'Nueva OT';
-  document.getElementById('deleteBtn').style.display = isEdit ? 'flex' : 'none';
+// ══════════════════════════════════════════════════════
+const FIELDS=['numOT','estado','tipoIntervencion','tipoOT','numAviso','contacto',
+  'especialidad','departamento','grupoInsta','subGrupoInsta','area',
+  'fechaAviso','fechaLanza','fechaIniInter','fechaFinInter',
+  'tipoAveria','situacionFinal','motivoDemora','prl','numSerie','observaciones','informe'];
 
-  if (isEdit) {
-    const o = otData[idx];
-    editingRow = o._row;
-    const flds = ['numOT','estado','tipoIntervencion','tipoOT','numAviso','contacto',
-                  'especialidad','departamento','grupoInsta','subGrupoInsta','area',
-                  'fechaAviso','fechaLanza','fechaIniInter','fechaFinInter',
-                  'tipoAveria','situacionFinal','motivoDemora','contador','prl','numSerie',
-                  'observaciones','informe'];
-    flds.forEach(k => {
-      const el = document.getElementById('f_'+k);
-      if (el) el.value = o[k] || '';
-    });
+function openModal(id) {
+  editingId=id||null;
+  const isEdit=id!=null;
+  document.getElementById('modalTitle').textContent=isEdit?`Editar OT — ${otData.find(o=>o.id===id)?.numOT}`:'Nueva OT';
+  document.getElementById('deleteBtn').style.display=isEdit?'flex':'none';
+  if(isEdit){
+    const o=otData.find(x=>x.id===id);
+    FIELDS.forEach(k=>{const el=document.getElementById('f_'+k);if(el)el.value=o[k]||'';});
   } else {
-    document.getElementById('modal').querySelectorAll('input,select,textarea').forEach(el=>el.value='');
-    document.getElementById('f_estado').value = 'Iniciada';
-    document.getElementById('f_tipoIntervencion').value = 'PREVENTIVO';
-    document.getElementById('f_tipoOT').value = 'Instalación';
-    document.getElementById('f_especialidad').value = 'ELECTRICIDAD';
-    document.getElementById('f_prl').value = 'No';
-    const now = new Date().toISOString().slice(0,16);
-    document.getElementById('f_fechaAviso').value = now;
-    document.getElementById('f_fechaLanza').value = now;
+    document.querySelector('.modal').querySelectorAll('input,select,textarea').forEach(el=>el.value='');
+    document.getElementById('f_estado').value='Iniciada';
+    document.getElementById('f_tipoIntervencion').value='PREVENTIVO';
+    document.getElementById('f_tipoOT').value='Instalación';
+    document.getElementById('f_especialidad').value='ELECTRICIDAD';
+    document.getElementById('f_prl').value='No';
   }
-
   document.getElementById('overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
-
-function closeModal() {
-  document.getElementById('overlay').classList.remove('open');
-  document.body.style.overflow = '';
-  editingIdx = null; editingRow = null;
-}
-
-function closeOutside(e) {
-  if (e.target === document.getElementById('overlay')) closeModal();
-}
+function closeModal(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';editingId=null}
+function closeOutside(e){if(e.target===document.getElementById('overlay'))closeModal()}
 
 async function saveOT() {
-  const numOT = document.getElementById('f_numOT').value.trim();
-  if (!numOT) { toast('El número de OT es obligatorio','error'); return; }
+  const numOT=document.getElementById('f_numOT').value.trim();
+  if(!numOT){showToast('El número de OT es obligatorio','error');return}
+  const data={};
+  FIELDS.forEach(k=>{const el=document.getElementById('f_'+k);data[k]=el?el.value:''});
 
-  const data = {};
-  ['numOT','estado','tipoIntervencion','tipoOT','numAviso','contacto',
-   'especialidad','departamento','grupoInsta','subGrupoInsta','area',
-   'fechaAviso','fechaLanza','fechaIniInter','fechaFinInter',
-   'tipoAveria','situacionFinal','motivoDemora','contador','prl','numSerie',
-   'observaciones','informe'].forEach(k => {
-    const el = document.getElementById('f_'+k);
-    data[k] = el ? el.value : '';
-  });
+  const btn=document.getElementById('saveBtn');
+  const lbl=document.getElementById('saveBtnTxt');
+  btn.disabled=true; lbl.textContent='⏳ Guardando en GitHub...';
 
-  const btn = document.getElementById('saveBtn');
-  const lbl = document.getElementById('saveBtnText');
-  btn.disabled = true; lbl.textContent = '⏳ Guardando...';
+  if(editingId!=null){
+    const idx=otData.findIndex(x=>x.id===editingId);
+    otData[idx]={...otData[idx],...data};
+  } else {
+    const maxId=otData.length?Math.max(...otData.map(x=>x.id)):0;
+    otData.push({id:maxId+1,...data});
+  }
 
-  try {
-    const action = editingIdx !== null ? 'update' : 'create';
-    const body = { action, data };
-    if (action === 'update') body.row = editingRow;
-
-    const res = await apiPost(body);
-    if (!res.ok) throw new Error(res.error);
-
-    toast(action==='create' ? '✅ OT creada en Google Sheets' : '✅ OT actualizada en Google Sheets');
-    closeModal();
-    await loadOTs();
-  } catch(e) {
-    toast('Error: '+e.message, 'error');
-  } finally {
-    btn.disabled = false; lbl.textContent = '💾 Guardar OT';
+  const ok=await saveToGitHub(editingId?`Update OT ${data.numOT}`:`Create OT ${data.numOT}`);
+  btn.disabled=false; lbl.textContent='💾 Guardar OT';
+  if(ok){
+    showToast(editingId?'✅ OT actualizada en GitHub':'✅ OT creada en GitHub');
+    closeModal(); render();
+  } else {
+    // Revert if save failed
+    await loadFromGitHub();
   }
 }
 
-async function confirmDelete(idx) {
-  if (!confirm(`¿Eliminar la OT ${otData[idx].numOT}? Esta acción no se puede deshacer.`)) return;
-  try {
-    const res = await apiPost({ action:'delete', row: otData[idx]._row });
-    if (!res.ok) throw new Error(res.error);
-    toast('🗑 OT eliminada');
-    await loadOTs();
-  } catch(e) { toast('Error: '+e.message,'error'); }
+async function confirmDelete(id) {
+  const o=otData.find(x=>x.id===id);
+  if(!confirm(`¿Eliminar la OT ${o?.numOT}? Se borrará de GitHub.`))return;
+  otData=otData.filter(x=>x.id!==id);
+  const ok=await saveToGitHub(`Delete OT ${o?.numOT}`);
+  if(ok){showToast('🗑 OT eliminada');render();}
+  else await loadFromGitHub();
+}
+function deleteCurrentOT(){if(editingId==null)return;closeModal();confirmDelete(editingId)}
+
+function toggleApiDocs(){
+  const p=document.getElementById('apiPanel');
+  p.style.display=p.style.display==='none'?'block':'none';
 }
 
-async function deleteCurrentOT() {
-  if (editingIdx === null) return;
-  closeModal();
-  await confirmDelete(editingIdx);
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=type==='error'?'var(--red)':'var(--green)';
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500);
 }
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
-// ══════════════════════════════════════════
-//  TOAST
-// ══════════════════════════════════════════
-function toast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.background = type==='error' ? 'var(--red)' : 'var(--green)';
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 3200);
-}
-
-// ══════════════════════════════════════════
-//  KEYBOARD
-// ══════════════════════════════════════════
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
-
-// ══════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  INIT
-// ══════════════════════════════════════════
-if (SCRIPT_URL) {
-  startApp();
-} else {
-  document.getElementById('setupScreen').style.display = 'flex';
-}
+// ══════════════════════════════════════════════════════
+loadFromGitHub();
 </script>
 </body>
 </html>
